@@ -139,7 +139,7 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR,'static')
+    os.path.join(BASE_DIR, 'static')
 ]
 
 # Set the static file directory for Render deployment
@@ -148,8 +148,9 @@ if IS_RENDER:
 else:
     STATIC_ROOT = os.path.join(BASE_DIR, 'newstatic')
 
-# Enable WhiteNoise compression and caching
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+# Use simpler WhiteNoise storage for Render
+# Changed from CompressedManifestStaticFilesStorage to avoid manifest errors
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR,"media")

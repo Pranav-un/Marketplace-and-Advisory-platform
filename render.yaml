@@ -6,6 +6,7 @@ services:
     startCommand: "gunicorn Smartfarm.wsgi:application --log-file=-"
     # We're relying on the RENDER environment variable which is automatically set
     # No need to set additional environment variables
+    healthCheckPath: /health/
 
 databases:
   - name: agriconnect-db

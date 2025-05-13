@@ -16,6 +16,7 @@ from django.db.models.query_utils import Q
 from django.utils.http import urlsafe_base64_encode
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.encoding import force_bytes
+import os
 
 
 @admin_only
@@ -24,7 +25,12 @@ def Index(request):
     context = {
         "products":products
     }
-    return render(request,"index.html",context)
+    
+    # Check if we're on Render and use the simplified template
+    if 'RENDER' in os.environ:
+        return render(request, "index_simple.html", context)
+    else:
+        return render(request, "index.html", context)
 
 def FarmerHome(request):
     products = FarmerProducts.objects.all()
@@ -304,17 +310,34 @@ def health_check(request):
     """
     # Check database connection
     try:
+        from django.db import connection
         with connection.cursor() as cursor:
             cursor.execute("SELECT 1")
             db_status = "ok"
     except Exception as e:
         db_status = str(e)
     
-    # Return health status
-    status = {
-        "status": "healthy",
-        "database": db_status,
-        "render": True
-    }
-    return JsonResponse(status)
+    # Return simple HTML directly, without using templates or static files
+    html = f"""
+    <!DOCTYPE html>
+    <html>
+        <head>
+            <title>AgriConnect Health Check</title>
+            <style>
+                body {{ font-family: Arial, sans-serif; padding: 20px; }}
+                .status {{ background: #e8f5e9; padding: 15px; border-radius: 5px; }}
+                h1 {{ color: #2e7d32; }}
+            </style>
+        </head>
+        <body>
+            <h1>AgriConnect Health Check</h1>
+            <div class="status">
+                <p><strong>Status:</strong> Service is running</p>
+                <p><strong>Database:</strong> {db_status}</p>
+                <p><strong>Render:</strong> {'Yes' if 'RENDER' in request.META.get('SERVER_SOFTWARE', '') else 'No'}</p>
+            </div>
+        </body>
+    </html>
+    """
+    return HttpResponse(html)
 
