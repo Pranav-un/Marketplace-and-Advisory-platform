@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: agriconnect
+    env: python
+    buildCommand: "./build.sh"
+    startCommand: "gunicorn Smartfarm.wsgi:application"
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: SECRET_KEY
+        generateValue: true
+      - key: WEB_CONCURRENCY
+        value: 4
+      - key: DJANGO_SETTINGS_MODULE
+        value: Smartfarm.settings
+      - key: PYTHON_VERSION
+        value: 3.9.0 
