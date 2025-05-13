@@ -1,0 +1,173 @@
+{% extends 'index.html' %}
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0 rounded-4">
+                <div class="card-body p-5">
+                    <div class="text-center mb-5">
+                        <div class="icon-circle mb-4">
+                            <i class="fas fa-user-plus fa-2x text-primary"></i>
+                        </div>
+                        <h6 class="text-primary text-uppercase fw-bold">Create Account</h6>
+                        <h2 class="display-5 mb-3">Join AgriConnect</h2>
+                        <p class="text-muted">Start your farming journey with us</p>
+                    </div>
+
+                    {% for message in messages %}
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        {{message}}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    {% endfor %}
+
+                    <form method="post" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        <div class="row g-4">
+                            {% for field in form %}
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3">
+                                    {{field}}
+                                    <label class="text-muted">{{field.label}}</label>
+                                </div>
+                                {% if field.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{field.errors}}
+                                </div>
+                                {% endif %}
+                            </div>
+                            {% endfor %}
+                        </div>
+                        
+                        <div class="d-grid gap-2 mt-5">
+                            <button class="btn btn-primary btn-lg rounded-pill py-3" type="submit">
+                                <i class="fas fa-user-plus me-2"></i>Create Account
+                            </button>
+                        </div>
+                    </form>
+
+                    <div class="text-center mt-4">
+                        <p class="text-muted mb-0">Already have an account? 
+                            <a href="{%url 'SignIn' %}" class="text-primary text-decoration-none">Login here</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Form Field Styling */
+    .form-floating {
+        position: relative;
+    }
+    
+    .form-floating input,
+    .form-floating textarea,
+    .form-floating select {
+        height: calc(3.5rem + 2px);
+        padding: 1rem 0.75rem;
+        border-radius: 0.5rem;
+        border: 1px solid #e0e0e0;
+        transition: all 0.3s ease;
+        width: 100%;
+        font-size: 1rem;
+        background-color: #fff;
+    }
+    
+    .form-floating textarea {
+        height: auto;
+        min-height: 100px;
+    }
+    
+    .form-floating label {
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+        padding: 1rem 0.75rem;
+        overflow: hidden;
+        text-align: start;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        pointer-events: none;
+        border: 1px solid transparent;
+        transform-origin: 0 0;
+        transition: opacity .1s ease-in-out,transform .1s ease-in-out;
+        color: #6c757d;
+    }
+    
+    .form-floating input:focus,
+    .form-floating textarea:focus,
+    .form-floating select:focus,
+    .form-floating input:not(:placeholder-shown),
+    .form-floating textarea:not(:placeholder-shown),
+    .form-floating select:not(:placeholder-shown) {
+        padding-top: 1.625rem;
+        padding-bottom: 0.625rem;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 0.2rem rgba(52, 173, 84, 0.1);
+    }
+    
+    .form-floating input:focus ~ label,
+    .form-floating textarea:focus ~ label,
+    .form-floating select:focus ~ label,
+    .form-floating input:not(:placeholder-shown) ~ label,
+    .form-floating textarea:not(:placeholder-shown) ~ label,
+    .form-floating select:not(:placeholder-shown) ~ label {
+        opacity: .65;
+        transform: scale(.85) translateY(-0.5rem) translateX(0.15rem);
+    }
+    
+    /* Card Styling */
+    .card {
+        background: #fff;
+        backdrop-filter: blur(10px);
+    }
+    
+    /* Icon Circle */
+    .icon-circle {
+        width: 80px;
+        height: 80px;
+        background: rgba(52, 173, 84, 0.1);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto;
+    }
+    
+    /* Button Styling */
+    .btn-primary {
+        background: var(--primary);
+        border: none;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-primary:hover {
+        background: #2d8f4a;
+        transform: translateY(-2px);
+    }
+    
+    /* Error Message Styling */
+    .invalid-feedback {
+        color: #dc3545;
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+    }
+    
+    /* Responsive Adjustments */
+    @media (max-width: 768px) {
+        .card-body {
+            padding: 2rem !important;
+        }
+        
+        .form-floating input,
+        .form-floating textarea,
+        .form-floating select {
+            height: calc(3rem + 2px);
+        }
+    }
+</style>
+{% endblock %}

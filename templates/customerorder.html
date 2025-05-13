@@ -1,0 +1,255 @@
+{% extends 'index.html' %}
+{% block content %}
+
+<style>
+    .orders-container {
+        padding: 120px 0 2rem 0;
+        min-height: 100vh;
+        background-color: #f8f9fa;
+    }
+    .alert-custom {
+        background: #fff3e0;
+        color: #e65100;
+        padding: 1rem 1.5rem;
+        border-radius: 15px;
+        margin-bottom: 2rem;
+        text-align: center;
+        font-weight: 500;
+        box-shadow: 0 4px 15px rgba(230, 81, 0, 0.1);
+    }
+    .card {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 8px 30px rgba(0,0,0,0.05);
+        padding: 2.5rem;
+        margin-bottom: 2rem;
+        border: none;
+    }
+    .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2.5rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 2px solid #f8f9fa;
+        background: none;
+    }
+    .card-title {
+        color: #1a1a1a;
+        font-size: 1.75rem;
+        font-weight: 600;
+        margin: 0;
+        letter-spacing: -0.5px;
+    }
+    .orders-count {
+        background: #4CAF50;
+        color: white;
+        padding: 0.6rem 1.2rem;
+        border-radius: 30px;
+        font-weight: 500;
+        font-size: 0.9rem;
+        letter-spacing: 0.3px;
+        box-shadow: 0 4px 15px rgba(76, 175, 80, 0.2);
+    }
+    .table {
+        margin-bottom: 0;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+    .table th {
+        background: #f8f9fa;
+        color: #1a1a1a;
+        font-weight: 600;
+        padding: 1.2rem 1rem;
+        text-align: left;
+        border: none;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    .table td {
+        color: #444;
+        vertical-align: middle;
+        border: none;
+        border-top: 1px solid #f0f0f0;
+        padding: 1.2rem 1rem;
+        font-size: 0.95rem;
+    }
+    .table tr:hover {
+        background: #f8f9fa;
+    }
+    .product-name {
+        color: #1a1a1a;
+        font-weight: 500;
+        font-size: 1rem;
+    }
+    .product-category {
+        color: #4CAF50;
+        font-weight: 500;
+        font-size: 0.9rem;
+        background: rgba(76, 175, 80, 0.1);
+        padding: 0.4rem 0.8rem;
+        border-radius: 20px;
+        display: inline-block;
+    }
+    .price-details {
+        display: flex;
+        flex-direction: column;
+        gap: 0.4rem;
+    }
+    .total-price {
+        color: #f57c00;
+        font-weight: 600;
+        font-size: 1rem;
+    }
+    .unit-price {
+        font-size: 0.85rem;
+        color: #666;
+    }
+    .quantity {
+        color: #1a1a1a;
+        font-weight: 500;
+    }
+    .status-badge {
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        display: inline-block;
+        text-align: center;
+        min-width: 120px;
+    }
+    .status-pending {
+        background: #fff3e0;
+        color: #e65100;
+    }
+    .status-accepted {
+        background: #e8f5e9;
+        color: #2e7d32;
+    }
+    .status-dispatched {
+        background: #e3f2fd;
+        color: #1565c0;
+    }
+    .status-rejected {
+        background: #ffebee;
+        color: #c62828;
+    }
+    .btn-cancel {
+        background: #f44336;
+        color: white;
+        border: none;
+        padding: 0.5rem 1.2rem;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        margin-right: 10px;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+    }
+    .btn-cancel:hover {
+        background: #e53935;
+        transform: translateY(-2px);
+        color: white;
+        box-shadow: 0 4px 12px rgba(244, 67, 54, 0.2);
+    }
+    .btn-delete {
+        background: #757575;
+        color: white;
+        border: none;
+        padding: 0.5rem 1.2rem;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+    }
+    .btn-delete:hover {
+        background: #616161;
+        transform: translateY(-2px);
+        color: white;
+        box-shadow: 0 4px 12px rgba(117, 117, 117, 0.2);
+    }
+    
+    @media (max-width: 992px) {
+        .card {
+            padding: 1.5rem;
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .card-header {
+            flex-direction: column;
+            gap: 1rem;
+            align-items: flex-start;
+        }
+        .table-responsive {
+            margin: 0 -1.5rem;
+        }
+        .table {
+            min-width: 800px;
+        }
+    }
+</style>
+
+<div class="container orders-container">
+    {% for m in messages %}
+        <div class="alert-custom">
+            {{m}}
+        </div>
+    {% endfor %}
+    
+    <div class="card">
+        <div class="card-header">
+            <h1 class="card-title">My Orders</h1>
+            <div class="orders-count">{{product|length}} Orders</div>
+        </div>
+        
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Product Name</th>
+                        <th>Category</th>
+                        <th>Quantity</th>
+                        <th>Price Details</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in product %}
+                    <tr>
+                        <td class="product-name">{{p.product.Product_Name}}</td>
+                        <td><span class="product-category">{{p.product.Product_Category}}</span></td>
+                        <td class="quantity">{{p.quantity}} kg</td>
+                        <td class="price-details">
+                            <span class="total-price">₹{{p.total_price}}</span>
+                            <span class="unit-price">₹{{p.product.Product_price}} per kg</span>
+                        </td>
+                        <td>
+                            <span class="status-badge {% if p.status == 'Customer Ordered' %}status-pending{% elif p.status == 'Order Accepted' %}status-accepted{% elif p.status == 'Order Despached' %}status-dispatched{% else %}status-rejected{% endif %}">
+                                {{p.status}}
+                            </span>
+                        </td>
+                        <td>
+                            <a href="{%url 'CancelOrderCustomer' p.id %}" class="btn-cancel">
+                                <i class="fas fa-times"></i>Cancel
+                            </a>
+                            <a href="{%url 'DeleteOrderCustomer' p.id %}" class="btn-delete">
+                                <i class="fas fa-trash-alt"></i>Delete
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

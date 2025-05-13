@@ -1,0 +1,238 @@
+{% extends 'index.html' %}
+{% block content %}
+
+<style>
+    .product-container {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        padding: 30px;
+        margin: 20px auto;
+    }
+    .product-image {
+        width: 100%;
+        height: 400px;
+        object-fit: cover;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    .product-details {
+        padding: 20px;
+    }
+    .product-title {
+        color: #333;
+        font-size: 24px;
+        margin-bottom: 15px;
+    }
+    .product-price {
+        color: #e67e22;
+        font-size: 28px;
+        font-weight: bold;
+        margin-bottom: 15px;
+    }
+    .product-category {
+        background: #f8f9fa;
+        padding: 8px 15px;
+        border-radius: 20px;
+        display: inline-block;
+        color: #666;
+        margin-bottom: 20px;
+    }
+    .product-description {
+        color: #666;
+        font-size: 16px;
+        line-height: 1.6;
+        margin: 20px 0;
+        padding: 15px;
+        background: #f8f9fa;
+        border-radius: 10px;
+    }
+    .product-stock {
+        background: #e8f5e9;
+        padding: 8px 15px;
+        border-radius: 20px;
+        display: inline-block;
+        color: #2e7d32;
+        font-weight: 600;
+        margin-top: 10px;
+    }
+    .order-form {
+        background: #f8f9fa;
+        padding: 25px;
+        border-radius: 10px;
+    }
+    .form-title {
+        color: #333;
+        font-size: 18px;
+        margin-bottom: 20px;
+        text-align: center;
+    }
+    .form-control {
+        width: 100%;
+        padding: 12px;
+        margin-bottom: 15px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+    .form-control:focus {
+        border-color: #e67e22;
+        box-shadow: 0 0 0 0.2rem rgba(230, 126, 34, 0.25);
+    }
+    .btn-order {
+        background: #e67e22;
+        color: white;
+        padding: 12px 30px;
+        border-radius: 25px;
+        border: none;
+        width: 100%;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    .btn-order:hover {
+        background: #d35400;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(230, 126, 34, 0.3);
+    }
+    /* Add spacing for fixed navbar */
+    .container {
+        padding-top: 100px; /* Adjust this value based on your navbar height */
+        margin-bottom: 50px;
+    }
+    .quantity-selector {
+        display: flex;
+        align-items: center;
+        margin: 20px 0;
+        gap: 10px;
+    }
+    .quantity-input {
+        width: 100px !important;
+        text-align: center;
+    }
+    .price-per-kg {
+        font-size: 16px;
+        color: #666;
+        margin-left: 10px;
+    }
+    .total-price {
+        color: #e67e22;
+        font-size: 20px;
+        font-weight: bold;
+        margin: 15px 0;
+    }
+    .stock-warning {
+        color: #dc3545;
+        font-size: 14px;
+        margin-top: 5px;
+        display: none;
+    }
+</style>
+
+<script>
+    function updatePrice(productId) {
+        const quantityInput = document.getElementById('quantity-' + productId);
+        const pricePerKg = parseFloat(document.getElementById('price-per-kg-' + productId).dataset.price);
+        const stockAvailable = parseInt(document.getElementById('stock-' + productId).dataset.stock);
+        const quantity = parseInt(quantityInput.value);
+        
+        // Validate quantity
+        if (quantity > stockAvailable) {
+            document.getElementById('stock-warning-' + productId).style.display = 'block';
+            document.getElementById('order-button-' + productId).disabled = true;
+        } else {
+            document.getElementById('stock-warning-' + productId).style.display = 'none';
+            document.getElementById('order-button-' + productId).disabled = false;
+        }
+        
+        // Update total price
+        const totalPrice = quantity * pricePerKg;
+        document.getElementById('total-price-' + productId).textContent = '₹' + totalPrice.toFixed(2);
+        
+        // Update hidden input
+        document.getElementById('total-price-input-' + productId).value = totalPrice;
+        document.getElementById('quantity-input-' + productId).value = quantity;
+    }
+</script>
+
+<div class="container">
+    {% for i in product %}
+    <div class="product-container">
+        <div class="row">
+            <div class="col-md-4">
+                <img src="{{i.Product_Image.url}}" class="product-image" alt="{{i.Product_Name}}">
+            </div>
+            <div class="col-md-4">
+                <div class="product-details">
+                    <h2 class="product-title">{{i.Product_Name}}</h2>
+                    <h3 class="product-price">
+                        <span id="price-per-kg-{{i.id}}" data-price="{{i.Product_price}}">₹{{i.Product_price}}</span>
+                        <span class="price-per-kg">per kg</span>
+                    </h3>
+                    <span class="product-category">{{i.Product_Category}}</span>
+                    <div class="product-description">
+                        {{i.Product_Discription}}
+                    </div>
+                    <span class="product-stock" id="stock-{{i.id}}" data-stock="{{i.Product_Stock}}">
+                        Stock Available: {{i.Product_Stock}} kg
+                    </span>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="order-form">
+                    <h4 class="form-title">Enter Your Details For Place Order</h4>
+                    
+                    {% if datalen <= 0 %}
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="quantity-selector">
+                            <label for="quantity-{{i.id}}">Quantity (kg):</label>
+                            <input type="number" id="quantity-{{i.id}}" class="form-control quantity-input" 
+                                   min="1" max="{{i.Product_Stock}}" value="1" 
+                                   onchange="updatePrice('{{i.id}}')" required>
+                        </div>
+                        <div class="total-price" id="total-price-{{i.id}}">₹{{i.Product_price}}</div>
+                        <div class="stock-warning" id="stock-warning-{{i.id}}">
+                            Requested quantity exceeds available stock!
+                        </div>
+                        <input type="hidden" name="quantity" id="quantity-input-{{i.id}}" value="1">
+                        <input type="hidden" name="total_price" id="total-price-input-{{i.id}}" value="{{i.Product_price}}">
+                        <input type="text" name="name" class="form-control" placeholder="Name" required>
+                        <input type="text" name="house" class="form-control" placeholder="House" required>
+                        <input type="text" name="city" class="form-control" placeholder="City" required>
+                        <input type="text" name="state" class="form-control" placeholder="State" required>
+                        <input type="number" name="phone" class="form-control" placeholder="Phone Number" required>
+                        <button type="submit" id="order-button-{{i.id}}" class="btn btn-order">Place Order</button>
+                    </form>
+                    {% else %}
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="quantity-selector">
+                            <label for="quantity-{{i.id}}">Quantity (kg):</label>
+                            <input type="number" id="quantity-{{i.id}}" class="form-control quantity-input" 
+                                   min="1" max="{{i.Product_Stock}}" value="1" 
+                                   onchange="updatePrice('{{i.id}}')" required>
+                        </div>
+                        <div class="total-price" id="total-price-{{i.id}}">₹{{i.Product_price}}</div>
+                        <div class="stock-warning" id="stock-warning-{{i.id}}">
+                            Requested quantity exceeds available stock!
+                        </div>
+                        <input type="hidden" name="quantity" id="quantity-input-{{i.id}}" value="1">
+                        <input type="hidden" name="total_price" id="total-price-input-{{i.id}}" value="{{i.Product_price}}">
+                        {% for userdata in userdata1 %}
+                        <input type="text" name="name" class="form-control" placeholder="Name" value="{{userdata.name}}" required>
+                        <input type="text" name="house" class="form-control" placeholder="House" value="{{userdata.house}}" required>
+                        <input type="text" name="city" class="form-control" placeholder="City" value="{{userdata.city}}" required>
+                        <input type="text" name="state" class="form-control" placeholder="State" value="{{userdata.state}}" required>
+                        <input type="number" name="phone" class="form-control" placeholder="Phone Number" value="{{userdata.phone}}" required>
+                        <button type="submit" id="order-button-{{i.id}}" class="btn btn-order">Place Order</button>
+                        {% endfor %}
+                    </form>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+{% endblock %}

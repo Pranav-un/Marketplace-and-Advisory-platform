@@ -1,0 +1,160 @@
+{% extends "farmerhome.html" %}
+{% load static %}
+{% block content %}
+
+<style>
+    .payment-container {
+        min-height: calc(100vh - 200px);
+        padding: 120px 0 2rem 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .payment-content {
+        text-align: center;
+        max-width: 600px;
+        margin: 0 auto;
+        background: white;
+        padding: 2rem;
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+
+    .payment-title {
+        color: #2c3e50;
+        font-size: 2rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+
+    .payment-description {
+        color: #666;
+        font-size: 1.1rem;
+        margin-bottom: 2rem;
+    }
+
+    .order-details {
+        background: #f8f9fa;
+        padding: 1.5rem;
+        border-radius: 10px;
+        margin-bottom: 2rem;
+        text-align: left;
+    }
+
+    .order-item {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 0.5rem;
+        color: #666;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid #eee;
+    }
+
+    .order-item:last-child {
+        border-bottom: none;
+    }
+
+    .order-total {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 2px solid #ddd;
+        font-weight: 600;
+        font-size: 1.2rem;
+        color: #2c3e50;
+    }
+
+    .payment-btn {
+        background: #548608;
+        color: white;
+        padding: 12px 30px;
+        border-radius: 25px;
+        border: none;
+        font-size: 1.1rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        box-shadow: 0 4px 15px rgba(84, 134, 8, 0.2);
+        display: inline-block;
+    }
+
+    .payment-btn:hover {
+        background: #3f6506;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(84, 134, 8, 0.3);
+        color: white;
+    }
+
+    .payment-btn:active {
+        transform: translateY(0);
+    }
+
+    .product-name {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 0.5rem;
+    }
+
+    .product-category {
+        color: #548608;
+        font-weight: 500;
+        margin-bottom: 1rem;
+    }
+</style>
+
+<div class="payment-container">
+    <div class="payment-content">
+        <h1 class="payment-title">Complete Your Payment</h1>
+        <p class="payment-description">Please review your order details and proceed with the payment.</p>
+        
+        <div class="order-details">
+            <div class="product-name">{{product.Product_Name}}</div>
+            <div class="product-category">{{product.Product_Category}}</div>
+            
+            <div class="order-item">
+                <span>Price per kg</span>
+                <span>₹{{base_price}}</span>
+            </div>
+            <div class="order-item">
+                <span>Quantity</span>
+                <span>{{quantity}} kg</span>
+            </div>
+            <div class="order-total">
+                <span>Total Amount</span>
+                <span>₹{{total_price}}</span>
+            </div>
+        </div>
+        
+        <button id="pay-btn" class="payment-btn">Make Payment</button>
+    </div>
+</div>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+    var options = {
+        key: "{{ razorpay_merchant_key }}",
+        amount: "{{ razorpay_amount }}",
+        currency: "{{ currency }}",
+        name: "{{product.Product_Name}}",
+        description: "{{quantity}} kg @ ₹{{base_price}}/kg",
+        order_id: "{{ razorpay_order_id }}",
+        callback_url: "{{ callback_url }}",
+        prefill: {
+            name: "{{ request.user.username }}",
+            email: "{{ request.user.email }}"
+        },
+        theme: {
+            color: "#548608"
+        }
+    };
+    var rzp1 = new Razorpay(options);
+    document.getElementById("pay-btn").onclick = function(e) {
+        rzp1.open();
+        e.preventDefault();
+    };
+</script>
+
+{% endblock %}

@@ -1,0 +1,388 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>AgriConnect - Expert Dashboard</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta content="Agricultural Expert Platform" name="keywords">
+    <meta content="Expert Agricultural Solutions" name="description">
+
+    <!-- Favicon -->
+    <link href="{%static 'img/favicon.ico' %}" rel="icon">
+
+    <!-- Google Web Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+    <!-- Icon Font Stylesheet -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+
+    <!-- Libraries Stylesheet -->
+    <link href="{%static 'lib/owlcarousel/assets/owl.carousel.min.css' %}" rel="stylesheet">
+
+    <!-- Customized Bootstrap Stylesheet -->
+    <link href="{%static 'css/bootstrap.min.css' %}" rel="stylesheet">
+
+    <!-- Custom Stylesheet -->
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f4f6f9;
+        }
+        .navbar {
+            padding: 0.5rem 1rem;
+            background-color: #ffffff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+        }
+        .navbar-brand img {
+            height: 40px;
+            margin-right: 10px;
+        }
+        .navbar-brand h1 {
+            font-size: 1.5rem;
+            margin: 0;
+        }
+        .nav-item {
+            margin: 0 10px;
+        }
+        .card {
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+        .card:hover {
+            transform: scale(1.02);
+        }
+        .social-icons {
+            display: flex;
+            align-items: center;
+        }
+        .social-icons a {
+            margin: 0 5px;
+            color: #28a745;
+            font-size: 1rem;
+        }
+        .form-control, .btn {
+            border-radius: 20px;
+        }
+        
+        .status-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .status-image:hover {
+            transform: scale(1.05);
+        }
+
+        .farm-details-modal .modal-content {
+            border-radius: 15px;
+            border: none;
+        }
+
+        .farm-details-modal .modal-header {
+            background: #28a745;
+            color: white;
+            border-radius: 15px 15px 0 0;
+            padding: 1.5rem;
+        }
+
+        .farm-details-modal .modal-body {
+            padding: 2rem;
+        }
+
+        .farm-detail-item {
+            margin-bottom: 1.5rem;
+        }
+
+        .farm-detail-label {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+        }
+
+        .farm-detail-value {
+            color: #555;
+        }
+
+        .farm-image-large {
+            width: 100%;
+            max-height: 300px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+        }
+
+        .question-section {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+        }
+
+        .answer-section {
+            background: #e8f5e9;
+            padding: 1.5rem;
+            border-radius: 8px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-bottom: 1rem;
+        }
+
+        .status-badge.pending {
+            background: #fff3e0;
+            color: #e65100;
+        }
+
+        .status-badge.answered {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+        
+        .pinned-indicator {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #ff9800;
+            color: white;
+            font-size: 0.8rem;
+            padding: 4px 8px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            z-index: 10;
+        }
+        
+        .card.pinned {
+            border-left: 4px solid #ff9800;
+            box-shadow: 0 6px 10px rgba(255, 152, 0, 0.2);
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navbar Start -->
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <div class="container-fluid">
+            <a href="index.html" class="navbar-brand">
+                <img src="{%static 'img/logo.png' %}" alt="AgriConnect Logo" class="logo">
+                <h1 class="text-success">Agri<span class="text-dark">Connect</span></h1>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarCollapse">
+                <div class="navbar-nav mx-auto">
+                    <a href="{%url 'Index' %}" class="nav-item nav-link active">Home</a>
+
+                    {% if request.user.is_authenticated %}
+                        <a href="{%url 'FarmersProducts' %}" class="nav-item nav-link">Products</a>
+                        <a href="{%url 'FramersOrder' %}" class="nav-item nav-link">Orders</a>
+                        <div class="nav-item dropdown">
+                            <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">{{request.user}}</a>
+                            <div class="dropdown-menu m-0">
+                                <a href="{%url 'SignOut' %}" class="dropdown-item">LOGOUT</a>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="nav-item dropdown">
+                            <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Accounts</a>
+                            <div class="dropdown-menu m-0">
+                                <a href="{%url 'SignUp' %}" class="dropdown-item">Register</a>
+                                <a href="{%url 'SignIn' %}" class="dropdown-item">Login</a>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="social-icons">
+                    <a href="#" class="text-success"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="text-success"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="text-success"><i class="fab fa-linkedin-in"></i></a>
+                    <a href="#" class="text-success"><i class="fab fa-instagram"></i></a>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <!-- Navbar End -->
+
+    {% block content %}
+    <div class="container mt-4">
+        <!-- Pin status messages -->
+        {% for message in messages %}
+            {% if 'pin_status' in message.extra_tags %}
+            <div class="alert alert-{% if message.tags|cut:'pin_status '|cut:' pin_status' == 'success' %}success{% else %}danger{% endif %} alert-dismissible fade show mb-4" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endif %}
+        {% endfor %}
+        
+        <div class="row g-4">
+            {% for f in farm %}
+            <div class="col-md-4">
+                <div class="card border-0 h-100 {% if f.is_pinned %}pinned{% endif %}">
+                    {% if f.is_pinned %}
+                    <div class="pinned-indicator">
+                        <i class="fas fa-thumbtack"></i> Pinned
+                    </div>
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title text-success mb-3">
+                            <i class="fas fa-user-tie me-2"></i>Farmer: {{f.Farm.user}}
+                        </h5>
+                        <h6 class="card-subtitle mb-3 text-muted">
+                            <i class="fas fa-seedling me-2"></i>Crop: {{f.Farm.seedname}}
+                        </h6>
+                        
+                        {% if f.status_image %}
+                        <img src="{{ f.status_image.url }}" alt="Status Image" class="status-image mb-3" 
+                             data-bs-toggle="modal" data-bs-target="#farmModal{{f.id}}">
+                        {% endif %}
+                        
+                        <div class="bg-light p-3 rounded">
+                            <div class="status-badge {% if f.answers %}answered{% else %}pending{% endif %}">
+                                {{f.Status}}
+                            </div>
+                            <p class="card-text">
+                                <span class="fw-bold text-success">Question:</span> {{f.questions}}
+                            </p>
+                            <form action="{%url 'UpdateAnswer' f.id %}" method="post" class="mt-3">
+                                {% csrf_token %}
+                                <div class="input-group">
+                                    <span class="input-group-text bg-white">
+                                        <i class="fas fa-comment-dots text-success"></i>
+                                    </span>
+                                    <input type="text" value="{{f.answers}}" name="ans" class="form-control" 
+                                           placeholder="Add expert advice">
+                                    <button class="btn btn-success" type="submit">Update</button>
+                                </div>
+                            </form>
+                            <small class="text-muted d-block mt-2">
+                                <i class="far fa-clock me-2 text-success"></i>{{f.date}}
+                            </small>
+                            <div class="d-flex gap-2 mt-3">
+                                <button class="btn btn-outline-success btn-sm flex-grow-1" 
+                                        data-bs-toggle="modal" data-bs-target="#farmModal{{f.id}}">
+                                    <i class="fas fa-info-circle me-2"></i>View Details
+                                </button>
+                                <a href="{% url 'TogglePinStatus' f.id %}" class="btn btn-outline-warning btn-sm">
+                                    {% if f.is_pinned %}
+                                    <i class="fas fa-thumbtack fa-rotate-45"></i> Unpin
+                                    {% else %}
+                                    <i class="fas fa-thumbtack"></i> Pin
+                                    {% endif %}
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Farm Details Modal -->
+            <div class="modal fade farm-details-modal" id="farmModal{{f.id}}" tabindex="-1" 
+                 aria-labelledby="farmModalLabel{{f.id}}" aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="farmModalLabel{{f.id}}">
+                                <i class="fas fa-farm me-2"></i>Farm Details
+                            </h5>
+                            <button type="button" class="btn-close btn-close-white" 
+                                    data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <img src="{{f.Farm.image.url}}" alt="Farm Image" class="farm-image-large">
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="farm-detail-item">
+                                        <div class="farm-detail-label">Farmer Name</div>
+                                        <div class="farm-detail-value">{{f.Farm.user.get_full_name|default:f.Farm.user.username}}</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="farm-detail-item">
+                                        <div class="farm-detail-label">Seed Type</div>
+                                        <div class="farm-detail-value">{{f.Farm.seedname}}</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="farm-detail-item">
+                                        <div class="farm-detail-label">Farm Type</div>
+                                        <div class="farm-detail-value">{{f.Farm.farmfield}}</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="farm-detail-item">
+                                        <div class="farm-detail-label">Area</div>
+                                        <div class="farm-detail-value">{{f.Farm.framarea}} sq ft</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="question-section">
+                                <h6 class="mb-3">Current Status & Question</h6>
+                                <div class="status-badge {% if f.answers %}answered{% else %}pending{% endif %} mb-3">
+                                    {{f.Status}}
+                                </div>
+                                <p class="mb-0">{{f.questions}}</p>
+                            </div>
+
+                            {% if f.answers %}
+                            <div class="answer-section">
+                                <h6 class="mb-3">Expert Answer</h6>
+                                <p class="mb-0">{{f.answers}}</p>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endblock %}
+
+    <!-- Footer Start -->
+    <footer class="container-fluid bg-dark text-white mt-5 py-4">
+        <div class="container text-center">
+            <p class="mb-0">&copy; 2024 AgriConnect. All Rights Reserved.</p>
+        </div>
+    </footer>
+    <!-- Footer End -->
+
+    <!-- Back to Top -->
+    <a href="#" class="btn btn-success py-3 fs-4 back-to-top"><i class="bi bi-arrow-up"></i></a>
+
+    <!-- JavaScript Libraries -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{%static 'lib/easing/easing.min.js' %}"></script>
+    <script src="{%static 'lib/waypoints/waypoints.min.js' %}"></script>
+    <script src="{%static 'lib/counterup/counterup.min.js' %}"></script>
+    <script src="{%static 'lib/owlcarousel/owl.carousel.min.js' %}"></script>
+
+    <!-- Template Javascript -->
+    <script src="{%static 'js/main.js' %}"></script>
+</body>
+</html>

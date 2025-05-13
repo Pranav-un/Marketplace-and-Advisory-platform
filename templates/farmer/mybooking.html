@@ -1,0 +1,385 @@
+{% extends "farmerhome.html" %}
+{% block content %}
+
+<style>
+    .booking-container {
+        padding: 120px 0 2rem 0;
+        min-height: 100vh;
+        background-color: #f8f9fa;
+    }
+
+    .booking-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .booking-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .booking-title {
+        color: #2c3e50;
+        font-size: 1.8rem;
+        font-weight: 600;
+        margin: 0;
+    }
+
+    .booking-stats {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+    }
+
+    .stat-badge {
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .orders-badge {
+        background: #548608;
+        color: white;
+    }
+
+    .total-badge {
+        background: #2c3e50;
+        color: white;
+    }
+
+    .booking-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+
+    .booking-table th {
+        background: #f8f9fa;
+        color: #2c3e50;
+        font-weight: 600;
+        padding: 1rem;
+        text-align: left;
+        border-bottom: 2px solid #eee;
+    }
+
+    .booking-table td {
+        padding: 1rem;
+        border-bottom: 1px solid #eee;
+        color: #666;
+        vertical-align: middle;
+    }
+
+    .booking-table tr:hover {
+        background: #f8f9fa;
+    }
+
+    .product-info {
+        display: flex;
+        flex-direction: column;
+        gap: 0.3rem;
+    }
+
+    .product-name {
+        color: #2c3e50;
+        font-weight: 600;
+        font-size: 1.1rem;
+    }
+
+    .product-category {
+        color: #548608;
+        font-size: 0.9rem;
+    }
+
+    .price-info {
+        display: flex;
+        flex-direction: column;
+        gap: 0.3rem;
+        align-items: flex-start;
+    }
+
+    .unit-price {
+        color: #666;
+        font-size: 0.9rem;
+    }
+
+    .total-price {
+        color: #e67e22;
+        font-weight: 600;
+        font-size: 1.1rem;
+    }
+
+    .quantity-badge {
+        background: #e8f5e9;
+        color: #2e7d32;
+        padding: 0.4rem 0.8rem;
+        border-radius: 15px;
+        font-weight: 500;
+        font-size: 0.9rem;
+    }
+
+    .status-badge {
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .status-pending {
+        background: #fff3cd;
+        color: #856404;
+    }
+
+    .status-completed {
+        background: #d4edda;
+        color: #155724;
+    }
+
+    .status-cancelled {
+        background: #f8d7da;
+        color: #721c24;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .action-btn {
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        text-decoration: none;
+        font-size: 0.9rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .cancel-btn {
+        background: #fff3cd;
+        color: #856404;
+    }
+
+    .cancel-btn:hover {
+        background: #ffe69c;
+        transform: translateY(-2px);
+        color: #856404;
+    }
+
+    .delete-btn {
+        background: #f8d7da;
+        color: #721c24;
+    }
+
+    .delete-btn:hover {
+        background: #f5c6cb;
+        transform: translateY(-2px);
+        color: #721c24;
+    }
+
+    .alert {
+        background: #fff3cd;
+        color: #856404;
+        padding: 1rem;
+        border-radius: 10px;
+        margin-bottom: 2rem;
+        text-align: center;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 3rem;
+    }
+
+    .empty-state i {
+        font-size: 3rem;
+        color: #666;
+        margin-bottom: 1rem;
+    }
+
+    .empty-state h3 {
+        color: #2c3e50;
+        margin-bottom: 0.5rem;
+    }
+
+    .empty-state p {
+        color: #666;
+    }
+
+    @media (max-width: 768px) {
+        .booking-table {
+            display: block;
+            overflow-x: auto;
+        }
+    }
+
+    .status-info {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .status-accepted {
+        background: #e3f2fd;
+        color: #1976d2;
+    }
+
+    .status-dispatched {
+        background: #e8f5e9;
+        color: #2e7d32;
+    }
+
+    .status-transit {
+        background: #e3f2fd;
+        color: #1976d2;
+    }
+
+    .status-out-delivery {
+        background: #e1f5fe;
+        color: #0288d1;
+    }
+
+    .status-delivered {
+        background: #e8f5e9;
+        color: #2e7d32;
+    }
+
+    .status-failed {
+        background: #ffebee;
+        color: #c62828;
+    }
+
+    .status-returned {
+        background: #ede7f6;
+        color: #5e35b1;
+    }
+</style>
+
+<div class="booking-container">
+    <div class="container">
+        {% for m in messages %}
+        <div class="alert">{{m}}</div>
+        {% endfor %}
+
+        <div class="booking-card">
+            <div class="booking-header">
+                <h1 class="booking-title">My Bookings</h1>
+                <div class="booking-stats">
+                    <div class="stat-badge orders-badge">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span>{{product|length}} Orders</span>
+                    </div>
+                    <div class="stat-badge total-badge">
+                        <i class="fas fa-coins"></i>
+                        <span>Total: ₹{{total_price|default:"0"}}</span>
+                    </div>
+                </div>
+            </div>
+
+            {% if product %}
+            <div class="table-responsive">
+                <table class="booking-table">
+                    <thead>
+                        <tr>
+                            <th>Product Details</th>
+                            <th>Quantity</th>
+                            <th>Price Details</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for p in product %}
+                        <tr>
+                            <td>
+                                <div class="product-info">
+                                    <span class="product-name">{{p.product.Product_Name}}</span>
+                                    <span class="product-category">{{p.product.Product_Category}}</span>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="quantity-badge">
+                                    <i class="fas fa-weight"></i> {{p.quantity}} kg
+                                </span>
+                            </td>
+                            <td>
+                                <div class="price-info">
+                                    <span class="unit-price">₹{{p.product.Product_price}}/kg</span>
+                                    <span class="total-price">₹{{p.total_price}}</span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="status-info">
+                                    <span class="status-badge {% if p.status == 'Customer Ordered' %}status-pending
+                                        {% elif p.status == 'Order Accepted' %}status-accepted
+                                        {% elif p.status == 'Order Despached' %}status-dispatched
+                                        {% elif p.status == 'Payment Completed' %}status-completed
+                                        {% elif p.status == 'Cancelled By User' %}status-cancelled
+                                        {% else %}status-pending{% endif %}">
+                                        <i class="fas {% if p.status == 'Customer Ordered' %}fa-clock
+                                            {% elif p.status == 'Order Accepted' %}fa-check
+                                            {% elif p.status == 'Order Despached' %}fa-truck
+                                            {% elif p.status == 'Payment Completed' %}fa-check-circle
+                                            {% elif p.status == 'Cancelled By User' %}fa-times-circle
+                                            {% else %}fa-clock{% endif %}"></i>
+                                        {{p.status}}
+                                    </span>
+                                    {% if p.delivery_status and p.status == 'Order Despached' or p.status == 'Payment Completed' %}
+                                    <span class="status-badge {% if p.delivery_status == 'In Transit' %}status-transit
+                                        {% elif p.delivery_status == 'Out for Delivery' %}status-out-delivery
+                                        {% elif p.delivery_status == 'Delivered' %}status-delivered
+                                        {% elif p.delivery_status == 'Failed Delivery' %}status-failed
+                                        {% elif p.delivery_status == 'Returned' %}status-returned
+                                        {% endif %}">
+                                        <i class="fas {% if p.delivery_status == 'In Transit' %}fa-shipping-fast
+                                            {% elif p.delivery_status == 'Out for Delivery' %}fa-truck-loading
+                                            {% elif p.delivery_status == 'Delivered' %}fa-box-check
+                                            {% elif p.delivery_status == 'Failed Delivery' %}fa-exclamation-triangle
+                                            {% elif p.delivery_status == 'Returned' %}fa-undo
+                                            {% endif %}"></i>
+                                        {{p.delivery_status}}
+                                    </span>
+                                    {% endif %}
+                                </div>
+                            </td>
+                            <td class="action-buttons">
+                                <a href="{%url 'CancelOrderFarmer' p.id %}" class="action-btn cancel-btn">
+                                    <i class="fas fa-times-circle"></i>
+                                    Cancel
+                                </a>
+                                <a href="{%url 'DeleteOrderFarmer' p.id %}" class="action-btn delete-btn">
+                                    <i class="fas fa-trash-alt"></i>
+                                    Delete
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <i class="fas fa-shopping-basket"></i>
+                <h3>No Orders Yet</h3>
+                <p>You haven't placed any orders yet. Start shopping to see your orders here.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% endblock %} 

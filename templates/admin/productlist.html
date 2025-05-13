@@ -1,0 +1,613 @@
+{% extends "admin/admin_base.html" %}
+
+{% block extra_css %}
+<style>
+    /* Product Statistics */
+    .product-stats-container {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 25px;
+    }
+    
+    .product-stat-card {
+        flex: 1;
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: var(--card-shadow);
+        padding: 20px;
+        transition: transform 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .product-stat-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .stat-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        margin-bottom: 15px;
+    }
+    
+    .stat-value {
+        font-size: 2.2rem;
+        font-weight: 700;
+        margin-bottom: 5px;
+        color: var(--dark-color);
+    }
+    
+    .stat-label {
+        color: #666;
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+    
+    .decoration {
+        position: absolute;
+        top: -20px;
+        right: -20px;
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        opacity: 0.15;
+    }
+    
+    /* Filter tabs */
+    .filter-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+    }
+    
+    .filter-tabs {
+        display: flex;
+        background: #fff;
+        border-radius: 50px;
+        padding: 5px;
+        box-shadow: var(--card-shadow);
+    }
+    
+    .filter-tab {
+        padding: 10px 20px;
+        border-radius: 50px;
+        font-weight: 600;
+        font-size: 14px;
+        color: #555;
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+    
+    .filter-tab:hover {
+        color: var(--primary-color);
+    }
+    
+    .filter-tab.active {
+        background: var(--primary-color);
+        color: white;
+    }
+    
+    /* Product cards */
+    .product-card {
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: var(--card-shadow);
+        border: none;
+        margin-bottom: 1.5rem;
+        background: #fff;
+    }
+    
+    .product-card-header {
+        padding: 15px 20px;
+        font-weight: 600;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .customer-product-header {
+        background-color: rgba(46, 204, 113, 0.1);
+        color: #2ecc71;
+    }
+    
+    .farmer-product-header {
+        background-color: rgba(52, 152, 219, 0.1);
+        color: #3498db;
+    }
+    
+    .product-item {
+        padding: 20px;
+        border-bottom: 1px solid #f5f5f5;
+        transition: all 0.2s ease;
+    }
+    
+    .product-item:hover {
+        background-color: #f9f9f9;
+    }
+    
+    .product-item:last-child {
+        border-bottom: none;
+    }
+    
+    .product-details {
+        display: flex;
+        align-items: flex-start;
+        gap: 15px;
+    }
+    
+    .product-image {
+        width: 80px;
+        height: 80px;
+        border-radius: 10px;
+        background-color: #f5f5f5;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #aaa;
+        font-size: 24px;
+        flex-shrink: 0;
+        overflow: hidden;
+    }
+    
+    .product-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .product-info {
+        flex-grow: 1;
+    }
+    
+    .product-name {
+        font-weight: 600;
+        color: var(--dark-color);
+        font-size: 1.1rem;
+        margin-bottom: 5px;
+    }
+    
+    .product-description {
+        color: #666;
+        font-size: 0.9rem;
+        margin-bottom: 10px;
+    }
+    
+    .product-meta {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    
+    .product-badge {
+        background-color: rgba(46, 204, 113, 0.1);
+        color: var(--primary-color);
+        font-size: 0.8rem;
+        padding: 5px 12px;
+        border-radius: 50px;
+        font-weight: 500;
+    }
+    
+    .customer-product-badge {
+        background-color: rgba(46, 204, 113, 0.1);
+        color: #2ecc71;
+    }
+    
+    .farmer-product-badge {
+        background-color: rgba(52, 152, 219, 0.1);
+        color: #3498db;
+    }
+    
+    .product-category-badge {
+        background-color: rgba(155, 89, 182, 0.1);
+        color: #9b59b6;
+    }
+    
+    .product-price {
+        font-weight: 700;
+        font-size: 1.2rem;
+        color: #2ecc71;
+        margin-left: auto;
+    }
+    
+    .user-badge {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        background-color: rgba(52, 152, 219, 0.1);
+        color: #3498db;
+        padding: 5px 12px;
+        border-radius: 50px;
+        font-size: 0.8rem;
+        font-weight: 500;
+    }
+    
+    .product-stock {
+        font-size: 0.8rem;
+        padding: 5px 12px;
+        border-radius: 50px;
+        background-color: rgba(231, 76, 60, 0.1);
+        color: #e74c3c;
+    }
+    
+    .stock-available {
+        background-color: rgba(46, 204, 113, 0.1);
+        color: #2ecc71;
+    }
+    
+    /* Category charts */
+    .category-chart-container {
+        background: #fff;
+        border-radius: 15px;
+        box-shadow: var(--card-shadow);
+        padding: 20px;
+        margin-bottom: 25px;
+    }
+    
+    .category-title {
+        font-weight: 600;
+        color: var(--dark-color);
+        margin-bottom: 15px;
+    }
+    
+    .category-item {
+        margin-bottom: 12px;
+    }
+    
+    .category-label {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 5px;
+    }
+    
+    .category-name {
+        font-weight: 500;
+        color: #555;
+    }
+    
+    .category-value {
+        font-weight: 600;
+        color: var(--dark-color);
+    }
+    
+    .category-bar {
+        height: 8px;
+        background-color: #eee;
+        border-radius: 4px;
+        overflow: hidden;
+    }
+    
+    .category-progress {
+        height: 100%;
+        border-radius: 4px;
+    }
+    
+    /* Empty states */
+    .empty-state {
+        padding: 50px 20px;
+        text-align: center;
+    }
+    
+    .empty-state i {
+        font-size: 50px;
+        color: #ddd;
+        margin-bottom: 20px;
+    }
+    
+    .empty-state h4 {
+        color: #888;
+        margin-bottom: 10px;
+    }
+    
+    .empty-state p {
+        color: #aaa;
+        max-width: 400px;
+        margin: 0 auto;
+    }
+    
+    /* Responsive design */
+    @media (max-width: 992px) {
+        .product-stats-container {
+            flex-wrap: wrap;
+        }
+        
+        .product-stat-card {
+            min-width: calc(50% - 15px);
+        }
+        
+        .filter-container {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 15px;
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .product-details {
+            flex-direction: column;
+        }
+        
+        .product-image {
+            width: 100%;
+            height: 120px;
+        }
+        
+        .product-price {
+            margin-left: 0;
+            margin-top: 10px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="admin-header">
+    <span>Product Inventory</span>
+    <div class="date-filter">
+        <select class="form-select" onchange="window.location.href=this.value">
+            <option value="{% url 'ProductList' %}">All Time</option>
+            <option value="{% url 'ProductList' %}?period=month">This Month</option>
+            <option value="{% url 'ProductList' %}?period=week">This Week</option>
+        </select>
+    </div>
+</div>
+
+<!-- Product Statistics -->
+<div class="product-stats-container">
+    <div class="product-stat-card">
+        <div class="stat-icon" style="background: rgba(46, 204, 113, 0.1); color: #2ecc71;">
+            <i class="fas fa-box"></i>
+        </div>
+        <div class="stat-value">{{ stats.total_products }}</div>
+        <div class="stat-label">Total Products</div>
+        <div class="decoration" style="background: #2ecc71;"></div>
+    </div>
+    
+    <div class="product-stat-card">
+        <div class="stat-icon" style="background: rgba(52, 152, 219, 0.1); color: #3498db;">
+            <i class="fas fa-shopping-basket"></i>
+        </div>
+        <div class="stat-value">{{ stats.customer_products }}</div>
+        <div class="stat-label">Consumer Products</div>
+        <div class="decoration" style="background: #3498db;"></div>
+    </div>
+    
+    <div class="product-stat-card">
+        <div class="stat-icon" style="background: rgba(155, 89, 182, 0.1); color: #9b59b6;">
+            <i class="fas fa-seedling"></i>
+        </div>
+        <div class="stat-value">{{ stats.farmer_products }}</div>
+        <div class="stat-label">Farmer Products</div>
+        <div class="decoration" style="background: #9b59b6;"></div>
+    </div>
+</div>
+
+<!-- Category Distribution Chart -->
+<div class="row mb-4">
+    <div class="col-lg-8">
+        <div class="category-chart-container">
+            <h5 class="category-title">Product Categories</h5>
+            
+            <div class="category-item">
+                <div class="category-label">
+                    <span class="category-name"><i class="fas fa-apple-alt me-2"></i> Fruits</span>
+                    <span class="category-value">{{ stats.categories.Fruits }}</span>
+                </div>
+                <div class="category-bar">
+                    <div class="category-progress" style="width: 20%; background-color: #e74c3c;"></div>
+                </div>
+            </div>
+            
+            <div class="category-item">
+                <div class="category-label">
+                    <span class="category-name"><i class="fas fa-carrot me-2"></i> Vegetables</span>
+                    <span class="category-value">{{ stats.categories.Vegetable }}</span>
+                </div>
+                <div class="category-bar">
+                    <div class="category-progress" style="width: 30%; background-color: #2ecc71;"></div>
+                </div>
+            </div>
+            
+            <div class="category-item">
+                <div class="category-label">
+                    <span class="category-name"><i class="fas fa-flask me-2"></i> Fertilizers</span>
+                    <span class="category-value">{{ stats.categories.Fertilizer }}</span>
+                </div>
+                <div class="category-bar">
+                    <div class="category-progress" style="width: 25%; background-color: #3498db;"></div>
+                </div>
+            </div>
+            
+            <div class="category-item">
+                <div class="category-label">
+                    <span class="category-name"><i class="fas fa-seedling me-2"></i> Seeds</span>
+                    <span class="category-value">{{ stats.categories.Seeds }}</span>
+                </div>
+                <div class="category-bar">
+                    <div class="category-progress" style="width: 15%; background-color: #9b59b6;"></div>
+                </div>
+            </div>
+            
+            <div class="category-item">
+                <div class="category-label">
+                    <span class="category-name"><i class="fas fa-tools me-2"></i> Accessories</span>
+                    <span class="category-value">{{ stats.categories.Accessories }}</span>
+                </div>
+                <div class="category-bar">
+                    <div class="category-progress" style="width: 10%; background-color: #f39c12;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4">
+        <div class="filter-container">
+            <div class="filter-tabs mb-0">
+                <a href="{% url 'ProductList' %}" class="filter-tab {% if product_type == 'all' %}active{% endif %}">
+                    All Products
+                </a>
+                <a href="{% url 'ProductList' %}?type=customer" class="filter-tab {% if product_type == 'customer' %}active{% endif %}">
+                    Consumer
+                </a>
+                <a href="{% url 'ProductList' %}?type=farmer" class="filter-tab {% if product_type == 'farmer' %}active{% endif %}">
+                    Farmer
+                </a>
+            </div>
+        </div>
+        
+        <div class="product-card">
+            <div class="product-card-header" style="background-color: rgba(46, 204, 113, 0.1); color: #2ecc71;">
+                <i class="fas fa-info-circle me-2"></i> Quick Info
+            </div>
+            <div class="p-3">
+                <p class="mb-2"><i class="fas fa-check-circle me-2 text-success"></i> View all products in one place</p>
+                <p class="mb-2"><i class="fas fa-check-circle me-2 text-success"></i> Monitor inventory levels</p>
+                <p class="mb-2"><i class="fas fa-check-circle me-2 text-success"></i> Track product distribution</p>
+                <p class="mb-0"><i class="fas fa-check-circle me-2 text-success"></i> Filter by product type</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Consumer Products Section -->
+<div class="product-card">
+    <div class="product-card-header customer-product-header">
+        <div>
+            <i class="fas fa-shopping-basket me-2"></i> 
+            Consumer Products
+        </div>
+        <div class="badge bg-light text-dark">{{ stats.customer_products }} Products</div>
+    </div>
+    <div class="list-group list-group-flush">
+        {% if stats.customer_products > 0 %}
+            {% for product in customer_products %}
+                <div class="product-item">
+                    <div class="product-details">
+                        <div class="product-image">
+                            {% if product.Product_Image %}
+                                <img src="{{ product.Product_Image.url }}" alt="{{ product.Product_Name }}">
+                            {% else %}
+                                <i class="fas fa-shopping-basket"></i>
+                            {% endif %}
+                        </div>
+                        <div class="product-info">
+                            <div class="product-name">{{ product.Product_Name }}</div>
+                            <div class="product-description">{{ product.Product_Discription|truncatechars:100 }}</div>
+                            <div class="product-meta">
+                                <span class="product-badge product-category-badge">
+                                    <i class="fas fa-tags me-1"></i> {{ product.Product_Category }}
+                                </span>
+                                
+                                <span class="user-badge">
+                                    <i class="fas fa-user me-1"></i> 
+                                    {% if product.user %}
+                                        {{ product.user.get_full_name|default:product.user.username }}
+                                    {% else %}
+                                        Unknown
+                                    {% endif %}
+                                </span>
+                                
+                                {% if product.Product_Stock >= 10 %}
+                                    <span class="product-stock stock-available">
+                                        <i class="fas fa-check-circle me-1"></i> In Stock ({{ product.Product_Stock }})
+                                    </span>
+                                {% elif product.Product_Stock > 0 %}
+                                    <span class="product-stock" style="background-color: rgba(243, 156, 18, 0.1); color: #f39c12;">
+                                        <i class="fas fa-exclamation-triangle me-1"></i> Low Stock ({{ product.Product_Stock }})
+                                    </span>
+    {% else %}
+                                    <span class="product-stock">
+                                        <i class="fas fa-times-circle me-1"></i> Out of Stock
+                                    </span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="product-price">₹{{ product.Product_price }}</div>
+                    </div>
+                </div>
+                    {% endfor %}
+        {% else %}
+            <div class="p-4 text-center text-muted">No consumer products found.</div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Farmer Products Section -->
+<div class="product-card">
+    <div class="product-card-header farmer-product-header">
+        <div>
+            <i class="fas fa-seedling me-2"></i> 
+            Farmer Products
+        </div>
+        <div class="badge bg-light text-dark">{{ stats.farmer_products }} Products</div>
+    </div>
+    <div class="list-group list-group-flush">
+        {% if stats.farmer_products > 0 %}
+            {% for product in farmer_products %}
+                <div class="product-item">
+                    <div class="product-details">
+                        <div class="product-image">
+                            {% if product.Product_image %}
+                                <img src="{{ product.Product_image.url }}" alt="{{ product.Product_Name }}">
+                            {% else %}
+                                <i class="fas fa-seedling"></i>
+                            {% endif %}
+                        </div>
+                        <div class="product-info">
+                            <div class="product-name">{{ product.Product_Name }}</div>
+                            <div class="product-description">
+                                {{ product.Product_Description|default:"No description available." }}
+                            </div>
+                            <div class="product-meta">
+                                <span class="product-badge product-category-badge">
+                                    <i class="fas fa-tags me-1"></i> {{ product.Product_Category }}
+                                </span>
+                                
+                                <span class="user-badge">
+                                    <i class="fas fa-user me-1"></i> 
+                                    {% if product.user %}
+                                        {{ product.user.get_full_name|default:product.user.username }}
+                                    {% else %}
+                                        Unknown
+                                    {% endif %}
+                                </span>
+                                
+                                {% if product.Product_stock >= 10 %}
+                                    <span class="product-stock stock-available">
+                                        <i class="fas fa-check-circle me-1"></i> In Stock ({{ product.Product_stock }})
+                                    </span>
+                                {% elif product.Product_stock > 0 %}
+                                    <span class="product-stock" style="background-color: rgba(243, 156, 18, 0.1); color: #f39c12;">
+                                        <i class="fas fa-exclamation-triangle me-1"></i> Low Stock ({{ product.Product_stock }})
+                                    </span>
+                                {% else %}
+                                    <span class="product-stock">
+                                        <i class="fas fa-times-circle me-1"></i> Out of Stock
+                                    </span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="product-price">₹{{ product.Product_price }}</div>
+                    </div>
+            </div>
+        {% endfor %}
+        {% else %}
+            <div class="p-4 text-center text-muted">No farmer products found.</div>
+    {% endif %}
+    </div>
+</div>
+
+{% if stats.total_products == 0 %}
+<div class="empty-state">
+    <i class="fas fa-box-open"></i>
+    <h4>No Products Found</h4>
+    <p>There are no products in the database matching your current filters.</p>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,401 @@
+{% extends "farmerhome.html" %}
+{% load static %}
+{% block content %}
+
+<style>
+    .farm-container {
+        padding: 120px 0 2rem 0;
+        min-height: 100vh;
+        background-color: #f8f9fa;
+    }
+
+    .farm-header {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+
+    .farm-header h1 {
+        color: #2c3e50;
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+    }
+
+    .farm-header p {
+        color: #666;
+        font-size: 1.1rem;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .farm-form-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .farm-form-card h3 {
+        color: #2c3e50;
+        font-size: 1.5rem;
+        margin-bottom: 1.5rem;
+        text-align: center;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: #555;
+        font-weight: 500;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus {
+        border-color: #34AD54;
+        box-shadow: 0 0 0 0.2rem rgba(52, 173, 84, 0.25);
+    }
+
+    .submit-btn {
+        background: #34AD54;
+        color: white;
+        padding: 12px 30px;
+        border-radius: 25px;
+        border: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        width: 100%;
+    }
+
+    .submit-btn:hover {
+        background: #2d8f44;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(52, 173, 84, 0.3);
+        color: white;
+    }
+
+    .farm-list-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        padding: 2rem;
+    }
+
+    .farm-list-card h3 {
+        color: #2c3e50;
+        font-size: 1.5rem;
+        margin-bottom: 1.5rem;
+        text-align: center;
+    }
+
+    .farm-item {
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .farm-item:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+
+    .farm-image {
+        width: 100%;
+        height: 150px;
+        object-fit: cover;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+    }
+
+    .farm-details {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .farm-detail-item {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .farm-detail-label {
+        color: #666;
+        font-size: 0.9rem;
+        margin-bottom: 0.25rem;
+    }
+
+    .farm-detail-value {
+        color: #2c3e50;
+        font-weight: 500;
+    }
+
+    .update-btn {
+        background: #3498db;
+        color: white;
+        padding: 8px 20px;
+        border-radius: 20px;
+        border: none;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-block;
+    }
+
+    .update-btn:hover {
+        background: #2980b9;
+        transform: translateY(-2px);
+        color: white;
+    }
+
+    .alert {
+        border-radius: 10px;
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .farm-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid #eee;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+    }
+
+    .delete-btn {
+        background: #dc3545;
+        color: white;
+        padding: 8px 20px;
+        border-radius: 20px;
+        border: none;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-block;
+    }
+
+    .delete-btn:hover {
+        background: #c82333;
+        transform: translateY(-2px);
+        color: white;
+        box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3);
+    }
+
+    .modal-confirm {
+        color: #636363;
+        width: 400px;
+        margin: 30px auto;
+    }
+
+    .modal-confirm .modal-content {
+        padding: 20px;
+        border-radius: 15px;
+        border: none;
+    }
+
+    .modal-confirm .modal-header {
+        border-bottom: none;   
+        position: relative;
+        justify-content: center;
+        padding-top: 2rem;
+    }
+
+    .modal-confirm h4 {
+        text-align: center;
+        font-size: 26px;
+        margin: 30px 0 -15px;
+    }
+
+    .modal-confirm .form-control, .modal-confirm .btn {
+        min-height: 40px;
+        border-radius: 3px; 
+    }
+
+    .modal-confirm .close {
+        position: absolute;
+        top: -5px;
+        right: -5px;
+    }
+
+    .modal-confirm .modal-footer {
+        border: none;
+        text-align: center;
+        border-radius: 5px;
+        font-size: 13px;
+        padding: 10px 15px 25px;
+    }
+
+    .modal-confirm .icon-box {
+        width: 80px;
+        height: 80px;
+        margin: 0 auto;
+        border-radius: 50%;
+        z-index: 9;
+        text-align: center;
+        border: 3px solid #f15e5e;
+    }
+
+    .modal-confirm .icon-box i {
+        color: #f15e5e;
+        font-size: 46px;
+        display: inline-block;
+        margin-top: 13px;
+    }
+
+    .modal-confirm .btn {
+        color: #fff;
+        border-radius: 20px;
+        background: #60c7c1;
+        text-decoration: none;
+        transition: all 0.4s;
+        line-height: normal;
+        min-width: 120px;
+        border: none;
+        min-height: 40px;
+        margin: 0 5px;
+    }
+
+    .modal-confirm .btn-secondary {
+        background: #c1c1c1;
+    }
+
+    .modal-confirm .btn-danger {
+        background: #f15e5e;
+    }
+
+    .modal-confirm .btn-danger:hover, .modal-confirm .btn-danger:focus {
+        background: #ee3535;
+    }
+</style>
+
+<div class="farm-container">
+    <div class="container">
+        <div class="farm-header">
+            <h1>Start Your Farming Journey</h1>
+            <p>Add your farm details and get expert guidance for successful farming. Track your farm's progress and manage your crops efficiently.</p>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="farm-form-card">
+                    <h3>Add New Farm Details</h3>
+                    {% for m in messages %}
+                    <div class="alert alert-warning">{{m}}</div>
+                    {% endfor %}
+                    <form action="{%url 'AddNewSeedFarm' %}" method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label>Seed Name</label>
+                            <input type="text" name="seed" class="form-control" placeholder="Enter seed name" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Farm Type</label>
+                            <select name="farmfields" class="form-control" required>
+                                <option value="">Select farm type</option>
+                                <option value="terrace">Terrace</option>
+                                <option value="land">Land</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Area (Square Feet)</label>
+                            <input type="text" name="area" class="form-control" placeholder="Enter area in square feet" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Current Status</label>
+                            <input type="text" name="status" class="form-control" placeholder="Enter current status" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Farm Picture</label>
+                            <input type="file" name="img" class="form-control" required>
+                        </div>
+                        <button type="submit" class="submit-btn">
+                            <i class="fas fa-plus me-2"></i>Add Farm
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="farm-list-card">
+                    <h3>Your Current Farms</h3>
+                    {% for f in farm %}
+                    <div class="farm-item">
+                        <img src="{{f.image.url}}" class="farm-image" alt="{{f.seedname}}">
+                        <div class="farm-details">
+                            <div class="farm-detail-item">
+                                <span class="farm-detail-label">Seed Name</span>
+                                <span class="farm-detail-value">{{f.seedname}}</span>
+                            </div>
+                            <div class="farm-detail-item">
+                                <span class="farm-detail-label">Farm Type</span>
+                                <span class="farm-detail-value">{{f.farmfield}}</span>
+                            </div>
+                            <div class="farm-detail-item">
+                                <span class="farm-detail-label">Area</span>
+                                <span class="farm-detail-value">{{f.framarea}} sq ft</span>
+                            </div>
+                            <div class="farm-detail-item">
+                                <span class="farm-detail-label">Status</span>
+                                <span class="farm-detail-value">{{f.framstatus}}</span>
+                            </div>
+                        </div>
+                        <div class="farm-actions">
+                            <small class="text-muted">Added on: {{f.date}}</small>
+                            <div class="action-buttons">
+                                <a href="{%url 'FramStatusUpdate' f.id %}" class="update-btn">
+                                    <i class="fas fa-edit me-2"></i>Update Status
+                                </a>
+                                <a href="#deleteModal{{f.id}}" class="delete-btn" data-bs-toggle="modal">
+                                    <i class="fas fa-trash me-2"></i>Delete Farm
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Delete Confirmation Modal -->
+                    <div class="modal fade" id="deleteModal{{f.id}}" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-confirm">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <div class="icon-box">
+                                        <i class="fas fa-exclamation-triangle"></i>
+                                    </div>
+                                    <h4 class="modal-title w-100">Are you sure?</h4>
+                                </div>
+                                <div class="modal-body text-center">
+                                    <p>Do you really want to delete this farm? This process cannot be undone.</p>
+                                    <p class="text-muted">Farm: {{f.seedname}}</p>
+                                </div>
+                                <div class="modal-footer justify-content-center">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                    <a href="{% url 'DeleteFarm' f.id %}" class="btn btn-danger">Delete</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

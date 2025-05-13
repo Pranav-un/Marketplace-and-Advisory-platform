@@ -1,0 +1,293 @@
+{% extends "admin/admin_base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<style>
+    .stat-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .stat-value {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        color: var(--dark-color);
+    }
+
+    .stat-label {
+        color: #666;
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+
+    .stat-change {
+        font-size: 0.8rem;
+        margin-top: 0.5rem;
+    }
+
+    .chart-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+    }
+
+    .chart-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: var(--dark-color);
+    }
+
+    .recent-activity {
+        background: #fff;
+        border-radius: 15px;
+        box-shadow: var(--card-shadow);
+        padding: 1.5rem;
+    }
+
+    .activity-item {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1rem 0;
+        border-bottom: 1px solid #eee;
+    }
+
+    .activity-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="admin-header">
+    <span>Dashboard Overview</span>
+    <div class="date-filter">
+        <select class="form-select">
+            <option>Last 7 Days</option>
+            <option>Last 30 Days</option>
+            <option>This Month</option>
+            <option>This Year</option>
+        </select>
+    </div>
+</div>
+
+<!-- Stats Row -->
+<div class="row g-4 mb-4">
+    <div class="col-xl-3 col-sm-6">
+        <div class="stat-card">
+            <div class="stat-icon" style="background: rgba(46, 204, 113, 0.1); color: #2ecc71;">
+                <i class="fas fa-users"></i>
+            </div>
+            <div class="stat-value">124</div>
+            <div class="stat-label">Total Users</div>
+            <div class="stat-change text-success">
+                <i class="fas fa-arrow-up"></i> 12% from last month
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-sm-6">
+        <div class="stat-card">
+            <div class="stat-icon" style="background: rgba(52, 152, 219, 0.1); color: #3498db;">
+                <i class="fas fa-user-tie"></i>
+            </div>
+            <div class="stat-value">23</div>
+            <div class="stat-label">Experts</div>
+            <div class="stat-change text-primary">
+                <i class="fas fa-arrow-up"></i> 5% from last month
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-sm-6">
+        <div class="stat-card">
+            <div class="stat-icon" style="background: rgba(155, 89, 182, 0.1); color: #9b59b6;">
+                <i class="fas fa-tractor"></i>
+            </div>
+            <div class="stat-value">61</div>
+            <div class="stat-label">Farmers</div>
+            <div class="stat-change text-danger">
+                <i class="fas fa-arrow-down"></i> 3% from last month
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-sm-6">
+        <div class="stat-card">
+            <div class="stat-icon" style="background: rgba(230, 126, 34, 0.1); color: #e67e22;">
+                <i class="fas fa-shopping-cart"></i>
+            </div>
+            <div class="stat-value">40</div>
+            <div class="stat-label">Customers</div>
+            <div class="stat-change text-success">
+                <i class="fas fa-arrow-up"></i> 8% from last month
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts Row -->
+<div class="row g-4 mb-4">
+    <div class="col-xl-8">
+        <div class="chart-card">
+            <div class="chart-header">
+                <div class="chart-title">User Growth Analytics</div>
+                <div class="btn-group">
+                    <button class="btn btn-sm btn-outline-secondary">Weekly</button>
+                    <button class="btn btn-sm btn-outline-secondary active">Monthly</button>
+                    <button class="btn btn-sm btn-outline-secondary">Yearly</button>
+                </div>
+            </div>
+            <canvas id="userGrowthChart" height="300"></canvas>
+        </div>
+    </div>
+    <div class="col-xl-4">
+        <div class="chart-card">
+            <div class="chart-header">
+                <div class="chart-title">User Distribution</div>
+            </div>
+            <canvas id="userDistributionChart" height="300"></canvas>
+        </div>
+    </div>
+</div>
+
+<!-- Activity and Products Row -->
+<div class="row g-4">
+    <div class="col-xl-8">
+        <div class="chart-card">
+            <div class="chart-header">
+                <div class="chart-title">Monthly Revenue</div>
+            </div>
+            <canvas id="revenueChart" height="300"></canvas>
+        </div>
+    </div>
+    <div class="col-xl-4">
+        <div class="recent-activity">
+            <h5 class="mb-4">Recent Activities</h5>
+            <div class="activity-item">
+                <div class="activity-icon bg-success">
+                    <i class="fas fa-user-plus"></i>
+                </div>
+                <div>
+                    <div class="fw-bold">New Expert Joined</div>
+                    <small class="text-muted">2 hours ago</small>
+                </div>
+            </div>
+            <div class="activity-item">
+                <div class="activity-icon bg-primary">
+                    <i class="fas fa-shopping-cart"></i>
+                </div>
+                <div>
+                    <div class="fw-bold">New Order Placed</div>
+                    <small class="text-muted">5 hours ago</small>
+                </div>
+            </div>
+            <div class="activity-item">
+                <div class="activity-icon bg-warning">
+                    <i class="fas fa-star"></i>
+                </div>
+                <div>
+                    <div class="fw-bold">New Review</div>
+                    <small class="text-muted">1 day ago</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // User Growth Chart
+    new Chart(document.getElementById('userGrowthChart'), {
+        type: 'line',
+        data: {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+            datasets: [{
+                label: 'Total Users',
+                data: [65, 78, 90, 105, 124, 137, 152, 167, 180, 195, 210, 224],
+                borderColor: '#2ecc71',
+                tension: 0.4,
+                fill: true,
+                backgroundColor: 'rgba(46, 204, 113, 0.1)'
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    // User Distribution Chart
+    new Chart(document.getElementById('userDistributionChart'), {
+        type: 'doughnut',
+        data: {
+            labels: ['Farmers', 'Experts', 'Customers'],
+            datasets: [{
+                data: [61, 23, 40],
+                backgroundColor: ['#9b59b6', '#3498db', '#e67e22']
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+
+    // Revenue Chart
+    new Chart(document.getElementById('revenueChart'), {
+        type: 'bar',
+        data: {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+            datasets: [{
+                label: 'Revenue',
+                data: [12000, 19000, 15000, 25000, 22000, 30000],
+                backgroundColor: 'rgba(46, 204, 113, 0.8)'
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return '$' + value;
+                        }
+                    }
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,37 @@
+{% extends "index.html" %}
+{% load static %}
+{% block content %}
+
+<div class="text-center mt-5" style="min-height: 80vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding-top: 80px;">
+    <h2 style="color: #333; margin-bottom: 20px;">Payment Gateway</h2>
+    <p style="color: #666; margin-bottom: 30px;">Click the button below to complete your payment</p>
+    
+    <button id="pay-btn" class="btn" style="background: #e67e22; color: white; padding: 15px 40px; border-radius: 30px; border: none; font-size: 18px; font-weight: 600; transition: all 0.3s ease; box-shadow: 0 5px 15px rgba(230, 126, 34, 0.3);">Make Payment</button>
+</div>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+    var options = {
+        // Enter the Key ID generated from the Dashboard
+        key: "{{ razorpay_merchant_key }}",
+        // Amount is in currency subunits.
+        // Default currency is INR. Hence,
+        // 50000 refers to 50000 paise
+        amount: "{{ razorpay_amount }}",
+        currency: "{{ currency }}",
+        // Your/store name.
+        name: "payment_integr",
+        // Pass the `id` obtained in the response of Step 1
+        order_id: "{{ razorpay_order_id }}",
+        callback_url: "{{ callback_url }}",
+    };
+    // initialise razorpay with the options.
+    var rzp1 = new Razorpay(options);
+    // add event listener to the payment button.
+    document.getElementById("pay-btn").onclick = function(e) {
+        rzp1.open();
+        e.preventDefault();
+    };
+</script>
+
+{% endblock %}

@@ -1,0 +1,103 @@
+{% extends "index.html" %}
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0 rounded-4">
+                <div class="card-body p-5">
+                    <div class="text-center mb-5">
+                        <div class="icon-circle mb-4">
+                            <i class="fas fa-user-check fa-2x text-primary"></i>
+                        </div>
+                        <h6 class="text-primary text-uppercase fw-bold">Welcome to AgriConnect</h6>
+                        <h2 class="display-5 mb-3">Choose Your Role</h2>
+                        <p class="text-muted">Select how you want to use AgriConnect</p>
+                    </div>
+
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <a href="{%url 'UserGroupChange' 'customer' %}" class="role-card customer-card text-decoration-none">
+                                <div class="card h-100 border-0 shadow-sm hover-lift">
+                                    <div class="card-body p-4 text-center">
+                                        <div class="role-icon mb-4">
+                                            <i class="fas fa-shopping-cart fa-2x text-primary"></i>
+                                        </div>
+                                        <h4 class="mb-3">I'm a Customer</h4>
+                                        <p class="text-muted mb-0">Browse and purchase fresh products from local farmers</p>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-md-6">
+                            <a href="{%url 'UserGroupChange' 'farmer' %}" class="role-card farmer-card text-decoration-none">
+                                <div class="card h-100 border-0 shadow-sm hover-lift">
+                                    <div class="card-body p-4 text-center">
+                                        <div class="role-icon mb-4">
+                                            <i class="fas fa-tractor fa-2x text-primary"></i>
+                                        </div>
+                                        <h4 class="mb-3">I'm a Farmer</h4>
+                                        <p class="text-muted mb-0">Sell your products and connect with customers</p>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .icon-circle {
+        width: 80px;
+        height: 80px;
+        background: rgba(52, 173, 84, 0.1);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto;
+    }
+
+    .role-icon {
+        width: 60px;
+        height: 60px;
+        background: rgba(52, 173, 84, 0.1);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto;
+    }
+
+    .hover-lift {
+        transition: all 0.3s ease;
+    }
+
+    .hover-lift:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+    }
+
+    .role-card {
+        display: block;
+        color: inherit;
+    }
+
+    .role-card:hover {
+        color: inherit;
+    }
+
+    .card {
+        border-radius: 1rem;
+        overflow: hidden;
+    }
+
+    @media (max-width: 768px) {
+        .card-body {
+            padding: 2rem !important;
+        }
+    }
+</style>
+{% endblock %}

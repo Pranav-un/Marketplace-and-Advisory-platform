@@ -1,0 +1,463 @@
+{% extends "farmerhome.html" %}
+{% load static %}
+{% block content %}
+
+<style>
+    .product-view-container {
+        padding: 120px 0 2rem 0;
+        min-height: 100vh;
+        background-color: #f8f9fa;
+    }
+
+    .product-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        padding: 2rem;
+        height: 100%;
+        transition: all 0.3s ease;
+    }
+
+    .product-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    }
+
+    .product-image {
+        width: 100%;
+        height: 400px;
+        object-fit: cover;
+        border-radius: 10px;
+        margin-bottom: 1.5rem;
+    }
+
+    .product-details {
+        margin-bottom: 1.5rem;
+    }
+
+    .product-detail-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.8rem 0;
+        border-bottom: 1px solid #eee;
+    }
+
+    .product-detail-label {
+        color: #666;
+        font-weight: 500;
+    }
+
+    .product-detail-value {
+        color: #2c3e50;
+        font-weight: 600;
+    }
+
+    .product-price {
+        color: #e67e22;
+        font-size: 1.5rem;
+        font-weight: 700;
+    }
+
+    .order-form {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        padding: 2rem;
+    }
+
+    .form-title {
+        color: #2c3e50;
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 2rem;
+        text-align: center;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: #555;
+        font-weight: 500;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus {
+        border-color: #548608;
+        box-shadow: 0 0 0 0.2rem rgba(84, 134, 8, 0.25);
+    }
+
+    .submit-btn {
+        background: #548608;
+        color: white;
+        padding: 12px 30px;
+        border-radius: 25px;
+        border: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        width: 100%;
+        margin-top: 1rem;
+    }
+
+    .submit-btn:hover {
+        background: #3f6506;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(84, 134, 8, 0.3);
+        color: white;
+    }
+
+    .section-title {
+        color: #2c3e50;
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 2rem;
+        text-align: center;
+    }
+
+    .product-badge {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        background: #548608;
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+
+    .stock-status {
+        display: inline-block;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        margin-bottom: 1rem;
+    }
+
+    .stock-status.available {
+        background: #e8f5e9;
+        color: #2e7d32;
+    }
+
+    .stock-status.unavailable {
+        background: #ffebee;
+        color: #c62828;
+    }
+
+    .expert-verified {
+        position: absolute;
+        top: 1rem;
+        left: 1rem;
+        background: #1976d2;
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .quantity-control {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin: 1rem 0;
+    }
+
+    .quantity-btn {
+        background: #f8f9fa;
+        border: 1px solid #ddd;
+        border-radius: 50%;
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .quantity-btn:hover {
+        background: #548608;
+        color: white;
+        border-color: #548608;
+    }
+
+    .quantity-input {
+        width: 80px;
+        text-align: center;
+        font-size: 1.1rem;
+        font-weight: 600;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 0.5rem;
+    }
+
+    .price-breakdown {
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 1.5rem;
+        margin: 1.5rem 0;
+    }
+
+    .price-item {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 0.5rem;
+        color: #666;
+    }
+
+    .price-total {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 2px solid #ddd;
+        font-weight: 600;
+        font-size: 1.2rem;
+        color: #2c3e50;
+    }
+
+    .product-image-wrapper {
+        position: relative;
+        overflow: hidden;
+        border-radius: 10px;
+    }
+
+    .product-card {
+        position: relative;
+    }
+
+    .error-message {
+        color: #dc3545;
+        font-size: 0.9rem;
+        margin-top: 0.5rem;
+        display: none;
+    }
+</style>
+
+<div class="product-view-container">
+    <div class="container">
+        <h1 class="section-title">Product Details</h1>
+        
+        {% for i in product %}
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="product-card">
+                    <div class="product-image-wrapper">
+                        <img src="{{i.Product_image.url}}" class="product-image" alt="{{i.Product_Name}}">
+                        <div class="product-badge">{{i.Product_Category}}</div>
+                        <div class="expert-verified">
+                            <i class="fas fa-check-circle"></i>
+                            Expert Verified
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="product-card">
+                    <div class="product-details">
+                        <h2 class="mb-3">{{i.Product_Name}}</h2>
+                        
+                        {% if i.Product_stock > 0 %}
+                        <div class="stock-status available">
+                            <i class="fas fa-check-circle me-2"></i>In Stock ({{i.Product_stock}} kg available)
+                        </div>
+                        {% else %}
+                        <div class="stock-status unavailable">
+                            <i class="fas fa-times-circle me-2"></i>Out of Stock
+                        </div>
+                        {% endif %}
+
+                        <div class="product-detail-item">
+                            <span class="product-detail-label">Base Price</span>
+                            <span class="product-detail-value product-price">₹{{i.Product_price}}/kg</span>
+                        </div>
+
+                        {% if i.Product_stock > 0 %}
+                        <div class="quantity-control">
+                            <button type="button" class="quantity-btn" onclick="updateQuantity(-1)">
+                                <i class="fas fa-minus"></i>
+                            </button>
+                            <input type="number" id="quantity" name="quantity" class="quantity-input" value="1" min="1" max="{{i.Product_stock}}" onchange="updatePrice()">
+                            <button type="button" class="quantity-btn" onclick="updateQuantity(1)">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                        <div class="error-message" id="quantity-error">
+                            Quantity cannot exceed available stock
+                        </div>
+
+                        <div class="price-breakdown">
+                            <div class="price-item">
+                                <span>Base Price (per kg)</span>
+                                <span>₹{{i.Product_price}}</span>
+                            </div>
+                            <div class="price-item">
+                                <span>Quantity</span>
+                                <span id="quantity-display">1 kg</span>
+                            </div>
+                            <div class="price-total">
+                                <span>Total Price</span>
+                                <span id="total-price">₹{{i.Product_price}}</span>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="order-form">
+                    <h3 class="form-title">Place Your Order</h3>
+                    
+                    {% if datalen <= 0 %}
+                    <form method="post" id="orderForm">
+                        {% csrf_token %}
+                        <input type="hidden" name="quantity" id="order-quantity" value="1">
+                        <div class="form-group">
+                            <label>Full Name</label>
+                            <input type="text" name="name" class="form-control" placeholder="Enter your name" required>
+                        </div>
+                        <div class="form-group">
+                            <label>House Address</label>
+                            <input type="text" name="house" class="form-control" placeholder="Enter your house address" required>
+                        </div>
+                        <div class="form-group">
+                            <label>City</label>
+                            <input type="text" name="city" class="form-control" placeholder="Enter your city" required>
+                        </div>
+                        <div class="form-group">
+                            <label>State</label>
+                            <input type="text" name="state" class="form-control" placeholder="Enter your state" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Phone Number</label>
+                            <input type="number" name="phone" class="form-control" placeholder="Enter your phone number" required>
+                        </div>
+                        <button type="submit" class="submit-btn" {% if i.Product_stock <= 0 %}disabled{% endif %}>
+                            <i class="fas fa-shopping-cart me-2"></i>Place Order
+                        </button>
+                    </form>
+                    {% else %}
+                    <form method="post" id="orderForm">
+                        {% csrf_token %}
+                        <input type="hidden" name="quantity" id="order-quantity" value="1">
+                        {% for userdata in userdata1 %}
+                        <div class="form-group">
+                            <label>Full Name</label>
+                            <input type="text" name="name" class="form-control" value="{{userdata.name}}" required>
+                        </div>
+                        <div class="form-group">
+                            <label>House Address</label>
+                            <input type="text" name="house" class="form-control" value="{{userdata.house}}" required>
+                        </div>
+                        <div class="form-group">
+                            <label>City</label>
+                            <input type="text" name="city" class="form-control" value="{{userdata.city}}" required>
+                        </div>
+                        <div class="form-group">
+                            <label>State</label>
+                            <input type="text" name="state" class="form-control" value="{{userdata.state}}" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Phone Number</label>
+                            <input type="number" name="phone" class="form-control" value="{{userdata.phone}}" required>
+                        </div>
+                        <button type="submit" class="submit-btn" {% if i.Product_stock <= 0 %}disabled{% endif %}>
+                            <i class="fas fa-shopping-cart me-2"></i>Place Order
+                        </button>
+                        {% endfor %}
+                    </form>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Get the base price by removing /kg from the text
+    const basePrice = parseFloat(document.querySelector('.product-price').textContent.replace('₹', '').replace('/kg', ''));
+    const maxStock = parseInt(document.querySelector('.quantity-input').getAttribute('max'));
+
+    // Function to update quantity
+    function updateQuantity(change) {
+        const quantityInput = document.getElementById('quantity');
+        const currentQuantity = parseInt(quantityInput.value) || 1;
+        // Make sure we don't exceed max stock or go below 1
+        const newQuantity = Math.max(1, Math.min(currentQuantity + change, maxStock));
+        
+        quantityInput.value = newQuantity;
+        document.getElementById('order-quantity').value = newQuantity;
+        document.getElementById('quantity-display').textContent = `${newQuantity} kg`;
+        updatePrice(newQuantity);
+    }
+
+    // Function to update price
+    function updatePrice(quantity) {
+        quantity = quantity || parseInt(document.getElementById('quantity').value) || 1;
+        const total = basePrice * quantity;
+        
+        // Update displays
+        document.getElementById('quantity-display').textContent = `${quantity} kg`;
+        document.getElementById('total-price').textContent = `₹${total.toFixed(2)}`;
+        document.getElementById('order-quantity').value = quantity;
+
+        // Also update the form's hidden quantity input
+        const orderQuantityInput = document.getElementById('order-quantity');
+        if (orderQuantityInput) {
+            orderQuantityInput.value = quantity;
+        }
+    }
+
+    // Add submit handler to the form
+    const orderForm = document.getElementById('orderForm');
+    if (orderForm) {
+        orderForm.addEventListener('submit', function(e) {
+            // Ensure the quantity is correctly set before submission
+            const quantity = parseInt(document.getElementById('quantity').value) || 1;
+            document.getElementById('order-quantity').value = quantity;
+        });
+    }
+
+    // Add click handlers for the plus/minus buttons
+    document.querySelectorAll('.quantity-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const isPlus = this.querySelector('.fa-plus') !== null;
+            updateQuantity(isPlus ? 1 : -1);
+        });
+    });
+
+    // Add change handler for quantity input
+    const quantityInput = document.getElementById('quantity');
+    quantityInput.addEventListener('change', function() {
+        let quantity = parseInt(this.value) || 1;
+        // Clamp the value between 1 and maxStock
+        quantity = Math.max(1, Math.min(quantity, maxStock));
+        this.value = quantity;
+        updatePrice(quantity);
+    });
+
+    // Initialize price on page load
+    updatePrice(1);
+});
+</script>
+
+{% endblock %}

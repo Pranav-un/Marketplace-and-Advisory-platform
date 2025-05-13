@@ -1,0 +1,553 @@
+{% extends "expert/experthome.html" %}
+{% block content %}
+<style>
+    .orders-container {
+        padding: 2rem 0;
+        min-height: calc(100vh - 100px);
+        background-color: #f8f9fa;
+    }
+
+    .page-header {
+        background: white;
+        padding: 2rem;
+        border-radius: 15px;
+        box-shadow: 0 2px 15px rgba(0,0,0,0.05);
+        margin-bottom: 2rem;
+    }
+
+    .page-title {
+        color: #2c3e50;
+        font-size: 2rem;
+        font-weight: 600;
+        margin: 0;
+    }
+
+    .orders-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 1.5rem;
+        padding: 1rem;
+    }
+
+    .order-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .order-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    }
+
+    .order-header {
+        padding: 1.5rem;
+        border-bottom: 1px solid #eee;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .order-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: #2c3e50;
+        margin: 0;
+    }
+
+    .order-date {
+        color: #666;
+        font-size: 0.9rem;
+    }
+
+    .order-body {
+        padding: 1.5rem;
+    }
+
+    .order-info {
+        margin-bottom: 1.5rem;
+    }
+
+    .info-item {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 0.8rem;
+        padding-bottom: 0.8rem;
+        border-bottom: 1px solid #eee;
+    }
+
+    .info-item:last-child {
+        border-bottom: none;
+    }
+
+    .info-label {
+        color: #666;
+        font-weight: 500;
+    }
+
+    .info-value {
+        color: #2c3e50;
+        font-weight: 600;
+    }
+
+    .status-badge {
+        padding: 0.4rem 1rem;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        display: inline-block;
+    }
+
+    .status-ordered {
+        background: #e3f2fd;
+        color: #1976d2;
+    }
+
+    .status-accepted {
+        background: #e8f5e9;
+        color: #2e7d32;
+    }
+
+    .status-rejected {
+        background: #ffebee;
+        color: #c62828;
+    }
+
+    .status-cancelled {
+        background: #fff3e0;
+        color: #ef6c00;
+    }
+
+    .status-despatched {
+        background: #f3e5f5;
+        color: #7b1fa2;
+    }
+
+    .payment-badge {
+        padding: 0.3rem 0.8rem;
+        border-radius: 15px;
+        font-size: 0.85rem;
+        font-weight: 500;
+    }
+
+    .payment-paid {
+        background: #e8f5e9;
+        color: #2e7d32;
+    }
+
+    .payment-pending {
+        background: #ffebee;
+        color: #c62828;
+    }
+
+    .order-actions {
+        padding: 1.5rem;
+        border-top: 1px solid #eee;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .order-actions > a:not(.status-buttons a) {
+        margin-top: 0.5rem;
+    }
+
+    .action-btn {
+        flex: 1;
+        padding: 0.6rem;
+        border-radius: 8px;
+        border: none;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-align: center;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    .btn-accept {
+        background: #e8f5e9;
+        color: #2e7d32;
+    }
+
+    .btn-accept:hover {
+        background: #2e7d32;
+        color: white;
+    }
+
+    .btn-reject {
+        background: #ffebee;
+        color: #c62828;
+    }
+
+    .btn-reject:hover {
+        background: #c62828;
+        color: white;
+    }
+
+    .btn-despatch {
+        background: #f3e5f5;
+        color: #7b1fa2;
+    }
+
+    .btn-despatch:hover {
+        background: #7b1fa2;
+        color: white;
+    }
+
+    .btn-delete {
+        background: #fafafa;
+        color: #333;
+    }
+
+    .btn-delete:hover {
+        background: #333;
+        color: white;
+    }
+
+    .alert {
+        border-radius: 10px;
+        margin-bottom: 1rem;
+        padding: 1rem;
+    }
+
+    .alert-warning {
+        background: #fff3e0;
+        color: #ef6c00;
+        border: 1px solid #ffe0b2;
+    }
+
+    .alert-info {
+        background: #e3f2fd;
+        color: #1976d2;
+        border: 1px solid #bbdefb;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 3rem;
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+
+    .empty-state i {
+        font-size: 3rem;
+        color: #666;
+        margin-bottom: 1rem;
+    }
+
+    .empty-state h3 {
+        color: #2c3e50;
+        margin-bottom: 0.5rem;
+    }
+
+    .empty-state p {
+        color: #666;
+    }
+
+    .status-update-form {
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
+    }
+
+    .status-select {
+        flex: 1;
+        padding: 0.5rem;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        color: #2c3e50;
+    }
+
+    .update-status-btn {
+        background: #7b1fa2;
+        color: white;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .update-status-btn:hover {
+        background: #6a1b9a;
+        transform: translateY(-2px);
+    }
+
+    .status-pending {
+        background: #f5f5f5;
+        color: #666;
+    }
+
+    .status-out-delivery {
+        background: #e1f5fe;
+        color: #0288d1;
+    }
+
+    .status-failed {
+        background: #fce4ec;
+        color: #d81b60;
+    }
+
+    .status-returned {
+        background: #ede7f6;
+        color: #5e35b1;
+    }
+
+    .toast {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background: #333;
+        color: white;
+        padding: 1rem 2rem;
+        border-radius: 8px;
+        display: none;
+        z-index: 1000;
+        animation: slideIn 0.3s ease;
+    }
+
+    @keyframes slideIn {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+
+    .status-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+        width: 100%;
+    }
+
+    .status-buttons .action-btn {
+        flex: 1 1 calc(50% - 0.5rem);
+        min-width: 120px;
+        margin-bottom: 0.5rem;
+    }
+
+    .btn-transit, .btn-out-delivery, .btn-delivered, .btn-failed, .btn-returned {
+        padding: 0.75rem 1rem;
+        font-size: 0.9rem;
+        font-weight: 500;
+        text-align: center;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-transit.active, .btn-out-delivery.active, .btn-delivered.active, 
+    .btn-failed.active, .btn-returned.active {
+        transform: scale(0.98);
+        filter: brightness(0.95);
+    }
+
+    .btn-transit {
+        background: #e3f2fd;
+        color: #1976d2;
+    }
+
+    .btn-transit:hover, .btn-transit.active {
+        background: #1976d2;
+        color: white;
+    }
+
+    .btn-out-delivery {
+        background: #e1f5fe;
+        color: #0288d1;
+    }
+
+    .btn-out-delivery:hover, .btn-out-delivery.active {
+        background: #0288d1;
+        color: white;
+    }
+
+    .btn-delivered {
+        background: #e8f5e9;
+        color: #2e7d32;
+    }
+
+    .btn-delivered:hover, .btn-delivered.active {
+        background: #2e7d32;
+        color: white;
+    }
+
+    .btn-failed {
+        background: #ffebee;
+        color: #c62828;
+    }
+
+    .btn-failed:hover, .btn-failed.active {
+        background: #c62828;
+        color: white;
+    }
+
+    .btn-returned {
+        background: #ede7f6;
+        color: #5e35b1;
+    }
+
+    .btn-returned:hover, .btn-returned.active {
+        background: #5e35b1;
+        color: white;
+    }
+</style>
+
+<div class="orders-container">
+    <div class="container">
+        <div class="page-header">
+            <h1 class="page-title">Manage Orders</h1>
+        </div>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert {% if 'warning' in message.tags %}alert-warning{% else %}alert-info{% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <div class="orders-grid">
+            {% for order in orders %}
+                <div class="order-card">
+                    <div class="order-header">
+                        <h3 class="order-title">{{ order.product.Product_Name }}</h3>
+                        <span class="order-date">{{ order.date }}</span>
+                    </div>
+                    <div class="order-body">
+                        <div class="order-info">
+                            <div class="info-item">
+                                <span class="info-label">Customer</span>
+                                <span class="info-value">{{ order.user.username }}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Quantity</span>
+                                <span class="info-value">{{ order.quantity }} kg</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Status</span>
+                                <span class="status-badge 
+                                    {% if order.status == 'Customer Ordered' %}status-ordered
+                                    {% elif order.status == 'Order Accepted' %}status-accepted
+                                    {% elif order.status == 'Order Rejected' %}status-rejected
+                                    {% elif order.status == 'Cancelled by Customer' %}status-cancelled
+                                    {% elif order.status == 'Order Despached' %}status-despatched{% endif %}">
+                                    {{ order.status }}
+                                </span>
+                            </div>
+                            {% if order.status == "Order Despached" %}
+                            <div class="info-item">
+                                <span class="info-label">Delivery Service</span>
+                                <span class="info-value">{{ order.delivery_service }}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Tracking Number</span>
+                                <span class="info-value">{{ order.tracking_number }}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Estimated Delivery</span>
+                                <span class="info-value">{{ order.estimated_delivery|date:"M d, Y" }}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Delivery Status</span>
+                                <span class="status-badge {% if order.delivery_status == 'In Transit' %}status-ordered
+                                    {% elif order.delivery_status == 'Out for Delivery' %}status-out-delivery
+                                    {% elif order.delivery_status == 'Delivered' %}status-accepted
+                                    {% elif order.delivery_status == 'Failed Delivery' %}status-failed
+                                    {% elif order.delivery_status == 'Returned' %}status-returned
+                                    {% else %}status-pending{% endif %}">
+                                    {{ order.delivery_status|default:"Pending" }}
+                                </span>
+                            </div>
+                            {% if order.delivery_notes %}
+                            <div class="info-item">
+                                <span class="info-label">Delivery Notes</span>
+                                <span class="info-value" style="white-space: pre-line">{{ order.delivery_notes }}</span>
+                            </div>
+                            {% endif %}
+                            {% endif %}
+                            <div class="info-item">
+                                <span class="info-label">Payment</span>
+                                <span class="payment-badge {% if order.Payment %}payment-paid{% else %}payment-pending{% endif %}">
+                                    {% if order.Payment %}Paid{% else %}Pending{% endif %}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="order-actions">
+                        {% if order.status == "Customer Ordered" %}
+                            <a href="{% url 'AcceptOrder' order.id %}" class="action-btn btn-accept">
+                                <i class="fas fa-check"></i> Accept
+                            </a>
+                            <a href="{% url 'RejectOrder' order.id %}" class="action-btn btn-reject">
+                                <i class="fas fa-times"></i> Reject
+                            </a>
+                        {% elif order.status == "Order Accepted" %}
+                            <a href="{% url 'DespachOrder' order.id %}" class="action-btn btn-despatch">
+                                <i class="fas fa-truck"></i> Despatch
+                            </a>
+                        {% elif order.status == "Order Despached" or order.status == "Payment Completed" %}
+                            <div class="status-buttons">
+                                <a href="{% url 'UpdateOrderStatus' order.id 'In Transit' %}" class="action-btn btn-transit {% if order.delivery_status == 'In Transit' %}active{% endif %}">
+                                    <i class="fas fa-shipping-fast"></i> In Transit
+                                </a>
+                                <a href="{% url 'UpdateOrderStatus' order.id 'Out for Delivery' %}" class="action-btn btn-out-delivery {% if order.delivery_status == 'Out for Delivery' %}active{% endif %}">
+                                    <i class="fas fa-truck-loading"></i> Out for Delivery
+                                </a>
+                                <a href="{% url 'UpdateOrderStatus' order.id 'Delivered' %}" class="action-btn btn-delivered {% if order.delivery_status == 'Delivered' %}active{% endif %}">
+                                    <i class="fas fa-box-check"></i> Delivered
+                                </a>
+                                <a href="{% url 'UpdateOrderStatus' order.id 'Failed Delivery' %}" class="action-btn btn-failed {% if order.delivery_status == 'Failed Delivery' %}active{% endif %}">
+                                    <i class="fas fa-exclamation-triangle"></i> Failed
+                                </a>
+                                <a href="{% url 'UpdateOrderStatus' order.id 'Returned' %}" class="action-btn btn-returned {% if order.delivery_status == 'Returned' %}active{% endif %}">
+                                    <i class="fas fa-undo"></i> Returned
+                                </a>
+                            </div>
+                        {% endif %}
+                        <a href="{% url 'DeleteOrder' order.id %}" class="action-btn btn-delete">
+                            <i class="fas fa-trash"></i> Delete
+                        </a>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="empty-state">
+                    <i class="fas fa-box-open"></i>
+                    <h3>No Orders Yet</h3>
+                    <p>When customers place orders for your products, they will appear here.</p>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<div id="statusToast" class="toast"></div>
+
+<script>
+function showToast(message, isSuccess = true) {
+    const toast = document.getElementById('statusToast');
+    toast.textContent = message;
+    toast.style.background = isSuccess ? '#4caf50' : '#f44336';
+    toast.style.display = 'block';
+    
+    setTimeout(() => {
+        toast.style.display = 'none';
+    }, 3000);
+}
+</script>
+{% endblock %}

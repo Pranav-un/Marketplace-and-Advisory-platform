@@ -1,0 +1,73 @@
+{% extends 'index.html' %}
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="card shadow-sm border-0 rounded-4">
+                <div class="card-body p-5">
+                    <div class="text-center mb-5">
+                        <h6 class="text-primary text-uppercase fw-bold">Welcome Back</h6>
+                        <h2 class="display-5 mb-3">Login to AgriConnect</h2>
+                        <p class="text-muted">Access your farming dashboard</p>
+                    </div>
+
+                    {% for message in messages %}
+                    {% if 'pin_status' not in message.extra_tags %}
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        {{message}}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+
+                    <form method="post" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        <div class="mb-4">
+                            <label class="form-label text-muted mb-2">Username</label>
+                            <input type="text" name="uname" class="form-control" required>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label text-muted mb-2">Password</label>
+                            <input type="password" name="pswd" class="form-control" required>
+                            <div class="d-flex justify-content-end mt-2">
+                                <a href="{% url 'password_reset' %}" class="text-primary small text-decoration-none">Forgot Password?</a>
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-primary btn-lg rounded-pill py-3" type="submit">
+                                <i class="fas fa-sign-in-alt me-2"></i>Login
+                            </button>
+                        </div>
+                    </form>
+
+                    <div class="text-center mt-4">
+                        <p class="text-muted mb-0">Don't have an account? 
+                            <a href="{%url 'SignUp' %}" class="text-primary text-decoration-none">Register here</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .form-control {
+        padding: 0.8rem 1rem;
+        border-radius: 0.5rem;
+        border: 1px solid #e0e0e0;
+        transition: all 0.3s ease;
+    }
+    
+    .form-control:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 0.2rem rgba(52, 173, 84, 0.1);
+    }
+    
+    .card {
+        background: #fff;
+        backdrop-filter: blur(10px);
+    }
+</style>
+{% endblock %}

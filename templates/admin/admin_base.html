@@ -1,0 +1,213 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>AgriConnect - Admin Dashboard</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta content="Agricultural Expertise Platform" name="keywords">
+    <meta content="Connect with agricultural experts and resources" name="description">
+
+    <!-- Favicon -->
+    <link href="{%static 'img/favicon.ico' %}" rel="icon">
+
+    <!-- Google Web Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <!-- Icon Font Stylesheet -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+
+    <!-- Libraries Stylesheet -->
+    <link href="{%static 'lib/owlcarousel/assets/owl.carousel.min.css' %}" rel="stylesheet">
+
+    <!-- Customized Bootstrap Stylesheet -->
+    <link href="{%static 'css/bootstrap.min.css' %}" rel="stylesheet">
+
+    <!-- Custom Stylesheet -->
+    <link href="{%static 'css/style.css' %}" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #2ecc71;
+            --secondary-color: #27ae60;
+            --dark-color: #212529;
+            --light-color: #f5f6fa;
+            --text-color: #333;
+            --card-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--light-color);
+            color: var(--text-color);
+        }
+
+        .admin-sidebar {
+            min-height: 100vh;
+            background: var(--dark-color);
+            color: #fff;
+            padding-top: 40px;
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 250px;
+            z-index: 1000;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        }
+
+        .admin-sidebar .nav-link {
+            color: #fff;
+            margin: 0.5rem 1rem;
+            font-size: 1rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .admin-sidebar .nav-link i {
+            width: 20px;
+        }
+
+        .admin-sidebar .nav-link.active, 
+        .admin-sidebar .nav-link:hover {
+            background: var(--primary-color);
+            color: #fff;
+            transform: translateX(5px);
+        }
+
+        .admin-main {
+            margin-left: 250px;
+            padding: 40px 30px;
+            min-height: 100vh;
+        }
+
+        .admin-header {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            color: var(--dark-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .stat-card {
+            background: #fff;
+            border-radius: 15px;
+            box-shadow: var(--card-shadow);
+            padding: 1.5rem;
+            transition: transform 0.3s ease;
+            border: none;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .chart-card {
+            background: #fff;
+            border-radius: 15px;
+            box-shadow: var(--card-shadow);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            border: none;
+        }
+
+        @media (max-width: 992px) {
+            .admin-sidebar {
+                width: 100%;
+                position: relative;
+                min-height: auto;
+            }
+            .admin-main {
+                margin-left: 0;
+                padding: 20px;
+            }
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+
+<body>
+    <!-- Sidebar -->
+    <div class="admin-sidebar">
+        <a href="{% url 'AdminHome' %}" class="nav-link">
+            <i class="fas fa-chart-line"></i>
+            Dashboard
+        </a>
+        <a href="{% url 'ExpertAdd' %}" class="nav-link">
+            <i class="fas fa-user-plus"></i>
+            Add Expert
+        </a>
+        <a href="{% url 'UserList' %}" class="nav-link">
+            <i class="fas fa-users"></i>
+            User Lists
+        </a>
+        <a href="{% url 'ProductList' %}" class="nav-link">
+            <i class="fas fa-box"></i>
+            Product List
+        </a>
+        <a href="{% url 'SignOut' %}" class="nav-link">
+            <i class="fas fa-sign-out-alt"></i>
+            Logout
+        </a>
+    </div>
+
+    <!-- Main Content -->
+    <div class="admin-main">
+        {% block content %}{% endblock %}
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    {% block extra_js %}{% endblock %}
+    
+    <script>
+        // Handle active sidebar link based on current URL
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get all sidebar links
+            const sidebarLinks = document.querySelectorAll('.admin-sidebar .nav-link');
+            
+            // Get current URL pathname
+            const currentPath = window.location.pathname;
+            
+            // Remove active class from all links
+            sidebarLinks.forEach(link => {
+                link.classList.remove('active');
+            });
+            
+            // Add active class to matching link
+            sidebarLinks.forEach(link => {
+                const href = link.getAttribute('href');
+                
+                if (href) {
+                    // Convert both to lowercase for case-insensitive comparison
+                    const hrefLower = href.toLowerCase();
+                    const pathLower = currentPath.toLowerCase();
+                    
+                    // Extract the last part of the URL for comparison
+                    const urlParts = pathLower.split('/');
+                    const lastPart = urlParts[urlParts.length - 1] || urlParts[urlParts.length - 2]; // Handle trailing slash
+                    
+                    if (
+                        (lastPart === '' && hrefLower.includes('adminhome')) ||
+                        (lastPart === 'adminhome' && hrefLower.includes('adminhome')) ||
+                        (lastPart === 'expertadd' && hrefLower.includes('expertadd')) ||
+                        (lastPart === 'userlist' && hrefLower.includes('userlist')) ||
+                        (lastPart === 'productlist' && hrefLower.includes('productlist'))
+                    ) {
+                        link.classList.add('active');
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html> 

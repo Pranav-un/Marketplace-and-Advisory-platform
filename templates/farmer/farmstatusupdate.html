@@ -1,0 +1,633 @@
+{% extends "farmerhome.html" %}
+{% block content %}
+
+<style>
+    .farm-status-container {
+        padding: 120px 0 2rem 0;
+        min-height: 100vh;
+        background-color: #f8f9fa;
+        margin-bottom: 60px;
+        position: relative;
+    }
+
+    .page-title {
+        text-align: center;
+        color: #2c3e50;
+        margin-bottom: 2rem;
+        font-size: 2rem;
+        font-weight: 600;
+    }
+
+    .farm-grid {
+        display: grid;
+        grid-template-columns: 350px 1fr;
+        gap: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .status-section {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.5rem;
+    }
+
+    .status-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        padding: 2rem;
+        height: 100%;
+        transition: all 0.3s ease;
+    }
+
+    .status-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    }
+
+    .section-title {
+        color: #2c3e50;
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+        text-align: center;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #548608;
+    }
+
+    .farm-image {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+        border-radius: 10px;
+        margin-bottom: 1.5rem;
+    }
+
+    .farm-details {
+        margin-bottom: 1.5rem;
+    }
+
+    .farm-detail-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid #eee;
+    }
+
+    .farm-detail-label {
+        color: #666;
+        font-weight: 500;
+    }
+
+    .farm-detail-value {
+        color: #2c3e50;
+        font-weight: 600;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: #555;
+        font-weight: 500;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus {
+        border-color: #548608;
+        box-shadow: 0 0 0 0.2rem rgba(84, 134, 8, 0.25);
+    }
+
+    .submit-btn {
+        background: #548608;
+        color: white;
+        padding: 0.8rem 2rem;
+        border-radius: 25px;
+        border: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        width: auto;
+        min-width: 200px;
+    }
+
+    .submit-btn:hover {
+        background: #3f6506;
+        transform: translateY(-2px);
+    }
+
+    .form-section {
+        background: white;
+        padding: 2rem;
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        margin-bottom: 2rem;
+    }
+
+    .form-title {
+        color: #2c3e50;
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+        text-align: center;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #548608;
+    }
+
+    .expert-opinions {
+        height: 600px;
+        overflow-y: auto;
+        padding-right: 1rem;
+    }
+
+    .expert-opinions::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .expert-opinions::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 3px;
+    }
+
+    .expert-opinions::-webkit-scrollbar-thumb {
+        background: #548608;
+        border-radius: 3px;
+    }
+
+    .opinion-item {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        border: 1px solid #e0e0e0;
+    }
+
+    .opinion-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid #eee;
+    }
+
+    .opinion-date {
+        color: #666;
+        font-size: 0.9rem;
+    }
+
+    .opinion-status {
+        color: #548608;
+        font-weight: 600;
+        padding: 0.3rem 1rem;
+        background: rgba(84, 134, 8, 0.1);
+        border-radius: 20px;
+    }
+
+    .opinion-content {
+        margin: 1rem 0;
+    }
+
+    .question-section {
+        background: #f8f9fa;
+        padding: 1rem;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+    }
+
+    .question-label {
+        color: #2c3e50;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+
+    .answer-section {
+        background: #fff;
+        padding: 1rem;
+        border-radius: 8px;
+        border-left: 3px solid #548608;
+    }
+
+    .status-image-container {
+        margin: 1rem 0;
+        text-align: center;
+    }
+
+    .status-update-image {
+        max-width: 100%;
+        max-height: 300px;
+        object-fit: contain;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .actions-section {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid #eee;
+    }
+
+    .delete-btn {
+        background: #dc3545;
+        color: white;
+        padding: 8px 20px;
+        border-radius: 20px;
+        border: none;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-block;
+    }
+
+    .delete-btn:hover {
+        background: #c82333;
+        transform: translateY(-2px);
+        color: white;
+    }
+
+    .status-image-preview {
+        width: 100%;
+        max-height: 150px;
+        object-fit: cover;
+        border-radius: 8px;
+        margin-top: 1rem;
+        display: none;
+    }
+
+    .image-upload-wrapper {
+        position: relative;
+        margin-bottom: 1.5rem;
+    }
+
+    .image-upload-label {
+        display: block;
+        padding: 0.75rem;
+        background: #f8f9fa;
+        border: 2px dashed #ddd;
+        border-radius: 8px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .image-upload-label:hover {
+        border-color: #548608;
+        background: #f1f8e9;
+    }
+
+    .image-upload-label i {
+        font-size: 1.5rem;
+        color: #548608;
+        margin-bottom: 0.5rem;
+    }
+
+    .image-upload-text {
+        display: block;
+        color: #666;
+        font-size: 0.9rem;
+    }
+
+    .farm-image-update-form {
+        margin-top: 1rem;
+        padding: 1rem;
+        background: #f8f9fa;
+        border-radius: 10px;
+    }
+
+    .farm-image-btn {
+        background: #2196F3;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 20px;
+        border: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        width: auto;
+        display: inline-block;
+        text-align: center;
+        margin-top: 1rem;
+    }
+
+    .farm-image-btn:hover {
+        background: #1976D2;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(33, 150, 243, 0.3);
+        color: white;
+    }
+
+    .status-history-section {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        margin-top: 2rem;
+        overflow: hidden;
+    }
+
+    .status-history-header {
+        background: #548608;
+        color: white;
+        padding: 1.5rem;
+        border-radius: 15px 15px 0 0;
+    }
+
+    .status-history-header h3 {
+        margin: 0;
+        font-size: 1.5rem;
+        font-weight: 600;
+    }
+
+    .status-history-content {
+        max-height: none;
+        padding: 1.5rem;
+    }
+
+    .opinion-item {
+        background: #f8f9fa;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        border: 1px solid #e0e0e0;
+        transition: all 0.3s ease;
+    }
+
+    .opinion-item:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+
+    .opinion-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid #eee;
+    }
+
+    .opinion-date {
+        color: #666;
+        font-size: 0.9rem;
+    }
+
+    .opinion-status {
+        background: rgba(84, 134, 8, 0.1);
+        color: #548608;
+        padding: 0.4rem 1rem;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+
+    .opinion-content {
+        margin: 1rem 0;
+    }
+
+    .question-section {
+        background: white;
+        padding: 1rem;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+        border-left: 3px solid #548608;
+    }
+
+    .answer-section {
+        background: #e8f5e9;
+        padding: 1rem;
+        border-radius: 8px;
+        margin-top: 1rem;
+    }
+
+    .status-image-container {
+        margin: 1rem 0;
+        text-align: center;
+    }
+
+    .status-update-image {
+        max-width: 100%;
+        max-height: 300px;
+        object-fit: contain;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .delete-btn {
+        background: #dc3545;
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        border: none;
+        font-size: 0.9rem;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .delete-btn:hover {
+        background: #c82333;
+        color: white;
+        transform: translateY(-2px);
+    }
+
+    .actions-section {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid #eee;
+    }
+
+    .main-content-wrapper {
+        height: calc(100vh - 200px);
+        overflow-y: auto;
+        padding-right: 15px;
+        margin-bottom: 2rem;
+    }
+
+    .main-content-wrapper::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .main-content-wrapper::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 4px;
+    }
+
+    .main-content-wrapper::-webkit-scrollbar-thumb {
+        background: #548608;
+        border-radius: 4px;
+    }
+
+    .main-content-wrapper::-webkit-scrollbar-thumb:hover {
+        background: #3f6506;
+    }
+
+    @media (max-width: 768px) {
+        .farm-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .main-content-wrapper {
+            height: auto;
+            max-height: none;
+        }
+    }
+</style>
+
+<div class="farm-status-container">
+    <div class="container">
+        <h1 class="page-title">Farm Status Management</h1>
+        
+        {% for m in messages %}
+        <div class="alert alert-success text-center">{{m}}</div>
+        {% endfor %}
+
+        <div class="row">
+            {% for i in Farm %}
+            <!-- Left Column - Farm Details -->
+            <div class="col-md-4">
+                <div class="status-card">
+                    <h3 class="section-title">Farm Details</h3>
+                    <img src="{{i.image.url}}" class="farm-image" alt="{{i.seedname}}">
+                    <div class="farm-details">
+                        <div class="farm-detail-item">
+                            <span class="farm-detail-label">Seed</span>
+                            <span class="farm-detail-value">{{i.seedname}}</span>
+                        </div>
+                        <div class="farm-detail-item">
+                            <span class="farm-detail-label">Farm Type</span>
+                            <span class="farm-detail-value">{{i.farmfield}}</span>
+                        </div>
+                        <div class="farm-detail-item">
+                            <span class="farm-detail-label">Farm Area</span>
+                            <span class="farm-detail-value">{{i.framarea}} sq ft</span>
+                        </div>
+                        <div class="farm-detail-item">
+                            <span class="farm-detail-label">Status</span>
+                            <span class="farm-detail-value">{{i.framstatus}}</span>
+                        </div>
+                    </div>
+
+                    <form action="{% url 'UpdateFarmImage' i.id %}" method="post" enctype="multipart/form-data" class="farm-image-update-form">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="farm_image" class="form-label">Update Farm Image</label>
+                            <input type="file" name="farm_image" id="farm_image" class="form-control" accept="image/*" required>
+                        </div>
+                        <button type="submit" class="farm-image-btn">
+                            <i class="fas fa-camera me-2"></i>Update Farm Image
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Right Column - Status Updates -->
+            <div class="col-md-8">
+                <div class="main-content-wrapper">
+                    <!-- Status Update Form -->
+                    <div class="status-card">
+                        <h3 class="section-title">Update Farm Status</h3>
+                        <form action="" method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <label>Current Status</label>
+                                <input type="text" name="status" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Questions for Expert</label>
+                                <textarea name="questions" class="form-control" rows="4" placeholder="Ask your questions here..."></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label>Upload Image with Question</label>
+                                <input type="file" name="status_image" class="form-control" accept="image/*" onchange="previewStatusImage(this)">
+                                <img id="statusImagePreview" class="status-image-preview">
+                            </div>
+                            <div class="actions-section">
+                                <button type="submit" class="submit-btn">
+                                    <i class="fas fa-paper-plane me-2"></i>Submit Update
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Status History Section -->
+                    <div class="status-history-section">
+                        <div class="status-history-header">
+                            <h3><i class="fas fa-history me-2"></i>Status History & Expert Opinions</h3>
+                        </div>
+                        <div class="status-history-content">
+                            {% for f in farmstatus %}
+                            <div class="opinion-item">
+                                <div class="opinion-header">
+                                    <div class="opinion-date">
+                                        <i class="far fa-calendar-alt me-2"></i>{{f.date}}
+                                    </div>
+                                    <div class="opinion-status">{{f.Status}}</div>
+                                </div>
+                                
+                                <div class="opinion-content">
+                                    <div class="question-section">
+                                        <h6 class="mb-2">Question:</h6>
+                                        <p class="mb-0">{{f.questions}}</p>
+                                    </div>
+
+                                    {% if f.status_image %}
+                                    <div class="status-image-container">
+                                        <img src="{{ f.status_image.url }}" alt="Status Update Image" class="status-update-image">
+                                    </div>
+                                    {% endif %}
+
+                                    {% if f.answers %}
+                                    <div class="answer-section">
+                                        <h6 class="mb-2">Expert Answer:</h6>
+                                        <p class="mb-0">{{f.answers}}</p>
+                                    </div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="actions-section">
+                                    <a href="{% url 'DeleteOpinion' f.id i.id %}" class="delete-btn">
+                                        <i class="fas fa-trash"></i>Delete
+                                    </a>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<script>
+function previewStatusImage(input) {
+    const preview = document.getElementById('statusImagePreview');
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            preview.style.display = 'block';
+            preview.src = e.target.result;
+        }
+        reader.readAsDataURL(input.files[0]);
+    } else {
+        preview.style.display = 'none';
+        preview.src = '';
+    }
+}
+</script>
+
+{% endblock %}

@@ -1,0 +1,205 @@
+{% extends "expert/experthome.html" %}
+{% block content %}
+<style>
+    .dispatch-container {
+        padding: 2rem 0;
+        min-height: calc(100vh - 100px);
+        background-color: #f8f9fa;
+    }
+
+    .dispatch-form {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        padding: 2rem;
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    .form-header {
+        margin-bottom: 2rem;
+        text-align: center;
+    }
+
+    .form-title {
+        color: #2c3e50;
+        font-size: 1.8rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-subtitle {
+        color: #666;
+        font-size: 1rem;
+    }
+
+    .order-summary {
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .summary-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 1rem;
+    }
+
+    .summary-item {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 0.8rem;
+        padding-bottom: 0.8rem;
+        border-bottom: 1px solid #eee;
+    }
+
+    .summary-item:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+        padding-bottom: 0;
+    }
+
+    .summary-label {
+        color: #666;
+        font-weight: 500;
+    }
+
+    .summary-value {
+        color: #2c3e50;
+        font-weight: 600;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+        display: block;
+        color: #2c3e50;
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus {
+        border-color: #7b1fa2;
+        box-shadow: 0 0 0 0.2rem rgba(123, 31, 162, 0.25);
+    }
+
+    textarea.form-control {
+        min-height: 100px;
+        resize: vertical;
+    }
+
+    .btn-group {
+        display: flex;
+        gap: 1rem;
+        margin-top: 2rem;
+    }
+
+    .btn {
+        flex: 1;
+        padding: 0.8rem;
+        border-radius: 8px;
+        border: none;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-align: center;
+        text-decoration: none;
+    }
+
+    .btn-primary {
+        background: #7b1fa2;
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background: #6a1b9a;
+        transform: translateY(-2px);
+    }
+
+    .btn-secondary {
+        background: #f5f5f5;
+        color: #333;
+    }
+
+    .btn-secondary:hover {
+        background: #e0e0e0;
+    }
+</style>
+
+<div class="dispatch-container">
+    <div class="container">
+        <div class="dispatch-form">
+            <div class="form-header">
+                <h1 class="form-title">Dispatch Order</h1>
+                <p class="form-subtitle">Enter delivery details for order tracking</p>
+            </div>
+
+            <div class="order-summary">
+                <h2 class="summary-title">Order Summary</h2>
+                <div class="summary-item">
+                    <span class="summary-label">Product</span>
+                    <span class="summary-value">{{ order.product.Product_Name }}</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">Customer</span>
+                    <span class="summary-value">{{ order.user.username }}</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">Quantity</span>
+                    <span class="summary-value">{{ order.quantity }} kg</span>
+                </div>
+            </div>
+
+            <form method="post">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label class="form-label">Delivery Service</label>
+                    <select name="delivery_service" class="form-control" required>
+                        <option value="">Select a delivery service</option>
+                        <option value="Express Delivery">Express Delivery</option>
+                        <option value="Standard Shipping">Standard Shipping</option>
+                        <option value="Economy Delivery">Economy Delivery</option>
+                        <option value="Local Courier">Local Courier</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Tracking Number</label>
+                    <input type="text" name="tracking_number" class="form-control" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Estimated Delivery Date</label>
+                    <input type="date" name="estimated_delivery" class="form-control" required 
+                           min="{{ order.date|date:'Y-m-d' }}">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Delivery Notes</label>
+                    <textarea name="delivery_notes" class="form-control" 
+                              placeholder="Add any special instructions or notes about the delivery"></textarea>
+                </div>
+
+                <div class="btn-group">
+                    <a href="{% url 'FramersOrder' %}" class="btn btn-secondary">Cancel</a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-truck me-2"></i>Dispatch Order
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %} 
