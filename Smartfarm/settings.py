@@ -10,35 +10,31 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
-# Temporarily import debug logging - remove after fixing the issue
-try:
-    import debug_log
-except ImportError:
-    pass
+# Remove debug logging for production
+# try:
+#     import debug_log
+# except ImportError:
+#     pass
 
 from pathlib import Path
 import os
 import dj_database_url
-from dotenv import load_dotenv
-
-# Load environment variables from .env file if it exists
-load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-!z-5ap+z$1h3ru%t=!vmq4^yse@t9(@x5$fqt1fgrlq(7@bv44')
+SECRET_KEY = 'django-insecure-!z-5ap+z$1h3ru%t=!vmq4^yse@t9(@x5$fqt1fgrlq(7@bv44'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get('DEBUG', 'False') == 'True'
+# Set DEBUG to True for development, False for production
+IS_RENDER = 'RENDER' in os.environ
+DEBUG = not IS_RENDER
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.onrender.com', '*']
-
 
 # Application definition
 
@@ -87,18 +83,25 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'Smartfarm.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
-# Database configuration with URL from environment variable
-DATABASES = {
-    'default': dj_database_url.config(
-        default='sqlite:///' + os.path.join(BASE_DIR, 'db.sqlite3'),
-        conn_max_age=600
-    )
-}
-
+# For development, use SQLite
+if not IS_RENDER:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
+# For production on Render, use the DATABASE_URL env var
+else:
+    DATABASES = {
+        'default': dj_database_url.config(
+            default='sqlite:///' + os.path.join(BASE_DIR, 'db.sqlite3'),
+            conn_max_age=600
+        )
+    }
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
@@ -118,7 +121,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
 
@@ -132,7 +134,6 @@ USE_L10N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
@@ -140,7 +141,12 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR,'static')
 ]
-STATIC_ROOT = os.path.join(BASE_DIR,"staticfiles")  # Changed from newstatic to staticfiles
+
+# Set the static file directory for Render deployment
+if IS_RENDER:
+    STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+else:
+    STATIC_ROOT = os.path.join(BASE_DIR, 'newstatic')
 
 # Enable WhiteNoise compression and caching
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
@@ -153,29 +159,20 @@ MEDIA_ROOT = os.path.join(BASE_DIR,"media")
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-
-RAZOR_KEY_ID = os.environ.get('RAZOR_KEY_ID', "rzp_test_9tCOZuKLhiZdaM")
-RAZOR_KEY_SECRET = os.environ.get('RAZOR_KEY_SECRET', "IfMivqkfXWvuJi2IR10W4bzN")
+# Razorpay configuration
+RAZOR_KEY_ID = "rzp_test_9tCOZuKLhiZdaM"
+RAZOR_KEY_SECRET = "IfMivqkfXWvuJi2IR10W4bzN"
 
 # Email configuration for password reset
-# -------------------------------------------------------------------------------
-# SETUP INSTRUCTIONS:
-# 1. Make sure 2-factor authentication is enabled on your Gmail account
-# 2. Go to https://myaccount.google.com/apppasswords
-# 3. Generate a new app password for "Django" or "AgriConnect"
-# 4. Replace 'your_app_password' below with the generated password
-# 5. No spaces should be in the app password when you paste it here
-# -------------------------------------------------------------------------------
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'  # Use standard backend
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', 'pranav.24pmc141@mariancollege.org')  
-EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', 'kqvj xzkz qllo aelv')
-DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'AgriConnect <pranav.24pmc141@mariancollege.org>')
+EMAIL_HOST_USER = 'pranav.24pmc141@mariancollege.org'  
+EMAIL_HOST_PASSWORD = 'kqvj xzkz qllo aelv'
+DEFAULT_FROM_EMAIL = 'AgriConnect <pranav.24pmc141@mariancollege.org>'
 
 # List of display names to randomize the "from" field for the same account
-# This gives the appearance of different senders while using the same email
 EMAIL_DISPLAY_NAMES = [
     'AgriConnect Support',
     'AgriConnect Team',
@@ -184,53 +181,13 @@ EMAIL_DISPLAY_NAMES = [
     'AgriConnect Accounts'
 ]
 
-# Security settings for production
-if not DEBUG:
-    # Only enable these if you're on HTTPS
-    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-    # Temporary disable during initial deployment troubleshooting
-    SECURE_SSL_REDIRECT = False  # Changed from True to False for troubleshooting
-    SESSION_COOKIE_SECURE = False  # Changed from True to False for troubleshooting
-    CSRF_COOKIE_SECURE = False  # Changed from True to False for troubleshooting
-    SECURE_BROWSER_XSS_FILTER = True
-    SECURE_CONTENT_TYPE_NOSNIFF = True
-
-# Logging configuration for better visibility in Render
+# Simplified logging for Render
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
-    'formatters': {
-        'verbose': {
-            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
-            'style': '{',
-        },
-        'simple': {
-            'format': '{levelname} {message}',
-            'style': '{',
-        },
-    },
     'handlers': {
         'console': {
-            'level': 'DEBUG',
             'class': 'logging.StreamHandler',
-            'formatter': 'verbose',
-        },
-    },
-    'loggers': {
-        'django': {
-            'handlers': ['console'],
-            'level': 'INFO',
-            'propagate': True,
-        },
-        'django.request': {
-            'handlers': ['console'],
-            'level': 'DEBUG',
-            'propagate': False,
-        },
-        'django.db.backends': {
-            'handlers': ['console'],
-            'level': 'INFO',
-            'propagate': False,
         },
     },
     'root': {

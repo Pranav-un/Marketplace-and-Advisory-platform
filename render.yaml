@@ -4,29 +4,8 @@ services:
     env: python
     buildCommand: "./build.sh"
     startCommand: "gunicorn Smartfarm.wsgi:application --log-file=-"
-    envVars:
-      - key: DATABASE_URL
-        sync: false
-      - key: SECRET_KEY
-        generateValue: true
-      - key: WEB_CONCURRENCY
-        value: 4
-      - key: DJANGO_SETTINGS_MODULE
-        value: Smartfarm.settings
-      - key: PYTHON_VERSION
-        value: 3.9.16
-      - key: DEBUG
-        value: False
-    healthCheckPath: /health/
-    disk:
-      name: agriconnect-data
-      mountPath: /data
-      sizeGB: 1
-
-  - type: redis
-    name: agriconnect-cache
-    ipAllowList: []  # Allow all connections
-    plan: free
+    # We're relying on the RENDER environment variable which is automatically set
+    # No need to set additional environment variables
 
 databases:
   - name: agriconnect-db
