@@ -10,6 +10,12 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
+# Temporarily import debug logging - remove after fixing the issue
+try:
+    import debug_log
+except ImportError:
+    pass
+
 from pathlib import Path
 import os
 import dj_database_url
@@ -31,7 +37,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-!z-5ap+z$1h3ru%t=!vmq
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.onrender.com']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.onrender.com', '*']
 
 
 # Application definition
@@ -134,7 +140,7 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR,'static')
 ]
-STATIC_ROOT = os.path.join(BASE_DIR,"newstatic")
+STATIC_ROOT = os.path.join(BASE_DIR,"staticfiles")  # Changed from newstatic to staticfiles
 
 # Enable WhiteNoise compression and caching
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
@@ -180,9 +186,55 @@ EMAIL_DISPLAY_NAMES = [
 
 # Security settings for production
 if not DEBUG:
+    # Only enable these if you're on HTTPS
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-    SECURE_SSL_REDIRECT = True
-    SESSION_COOKIE_SECURE = True
-    CSRF_COOKIE_SECURE = True
+    # Temporary disable during initial deployment troubleshooting
+    SECURE_SSL_REDIRECT = False  # Changed from True to False for troubleshooting
+    SESSION_COOKIE_SECURE = False  # Changed from True to False for troubleshooting
+    CSRF_COOKIE_SECURE = False  # Changed from True to False for troubleshooting
     SECURE_BROWSER_XSS_FILTER = True
     SECURE_CONTENT_TYPE_NOSNIFF = True
+
+# Logging configuration for better visibility in Render
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
+            'style': '{',
+        },
+        'simple': {
+            'format': '{levelname} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+        'django.request': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+        'django.db.backends': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'INFO',
+    },
+}

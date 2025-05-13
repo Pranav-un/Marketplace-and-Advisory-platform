@@ -3,7 +3,7 @@ services:
     name: agriconnect
     env: python
     buildCommand: "./build.sh"
-    startCommand: "gunicorn Smartfarm.wsgi:application"
+    startCommand: "gunicorn Smartfarm.wsgi:application --log-file=-"
     envVars:
       - key: DATABASE_URL
         sync: false
@@ -14,4 +14,21 @@ services:
       - key: DJANGO_SETTINGS_MODULE
         value: Smartfarm.settings
       - key: PYTHON_VERSION
-        value: 3.9.0 
+        value: 3.9.16
+      - key: DEBUG
+        value: False
+    healthCheckPath: /health/
+    disk:
+      name: agriconnect-data
+      mountPath: /data
+      sizeGB: 1
+
+  - type: redis
+    name: agriconnect-cache
+    ipAllowList: []  # Allow all connections
+    plan: free
+
+databases:
+  - name: agriconnect-db
+    databaseName: agriconnect
+    plan: free

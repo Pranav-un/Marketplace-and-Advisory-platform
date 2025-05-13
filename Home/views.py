@@ -4,7 +4,8 @@ from django.contrib.auth import authenticate, login,logout
 from .forms import UserAddForm
 from django.contrib.auth.models import User,Group
 from .decorators import admin_only,NullGroup
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
+from django.db import connection
 from farmer.models import FarmStatus
 from Products.models import ProductForCustomer
 from Expert.models import FarmerProducts
@@ -296,4 +297,24 @@ def password_reset_request(request):
                 messages.error(request, "No user with this email address exists.")
     password_reset_form = PasswordResetForm()
     return render(request=request, template_name="password/password_reset.html", context={"form": password_reset_form})
+
+def health_check(request):
+    """
+    A simple health check endpoint that Render can use to monitor the application
+    """
+    # Check database connection
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT 1")
+            db_status = "ok"
+    except Exception as e:
+        db_status = str(e)
+    
+    # Return health status
+    status = {
+        "status": "healthy",
+        "database": db_status,
+        "render": True
+    }
+    return JsonResponse(status)
 
