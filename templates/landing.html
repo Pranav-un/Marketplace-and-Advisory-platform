@@ -84,19 +84,6 @@
             padding: 40px 0;
             color: white;
         }
-        .product-card {
-            border: none;
-            transition: all 0.3s;
-        }
-        .product-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-        }
-        .product-img {
-            height: 200px;
-            object-fit: cover;
-            border-radius: 10px 10px 0 0;
-        }
     </style>
 </head>
 
@@ -104,60 +91,22 @@
     <!-- Header -->
     <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
         <div class="container">
-            <a href="{% url 'Index' %}" class="navbar-brand">
+            <a href="#" class="navbar-brand">
                 <span class="text-primary">Agri</span><span class="text-secondary">Connect</span>
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link active" href="{% url 'Index' %}">Home</a>
-                    </li>
-                    
-                    {% if request.user.is_authenticated %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'AllProducts' %}">Products</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'CustomerMybooking' %}">My Bookings</a>
-                    </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
-                            {{ request.user }}
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="{% url 'SignOut' %}">Logout</a></li>
-                        </ul>
-                    </li>
-                    {% else %}
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
-                            Account
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="{% url 'SignUp' %}">Register</a></li>
-                            <li><a class="dropdown-item" href="{% url 'SignIn' %}">Login</a></li>
-                        </ul>
-                    </li>
-                    {% endif %}
-                </ul>
-            </div>
         </div>
     </nav>
 
     <!-- Main Content -->
     <div class="container mt-4">
-        {% block content %}
         <!-- Hero Section -->
         <section class="hero-section text-center">
             <div class="container">
                 <h1 class="display-4 fw-bold">Welcome to AgriConnect</h1>
                 <p class="lead mb-4">Connecting farmers, experts, and customers in a sustainable ecosystem</p>
                 <div class="d-grid gap-3 d-sm-flex justify-content-sm-center">
-                    <a href="{% url 'SignUp' %}" class="btn btn-primary btn-lg px-4 gap-3">Join Now</a>
-                    <a href="#features" class="btn btn-outline-primary btn-lg px-4">Learn More</a>
+                    <a href="/signin" class="btn btn-primary btn-lg px-4 gap-3">Login Now</a>
+                    <a href="/signup" class="btn btn-outline-primary btn-lg px-4">Register</a>
                 </div>
             </div>
         </section>
@@ -200,40 +149,6 @@
                 </div>
             </div>
         </section>
-
-        <!-- Products Section -->
-        <section class="py-5 bg-light">
-            <div class="container">
-                <div class="text-center mb-5">
-                    <h2 class="fw-bold">Featured Products</h2>
-                    <p class="text-muted">Explore our selection of high-quality agricultural products</p>
-                </div>
-                <div class="row g-4">
-                    {% for product in products %}
-                    <div class="col-md-4">
-                        <div class="card product-card">
-                            {% if product.image %}
-                            <div class="bg-light text-center p-3">
-                                <i class="fas fa-leaf fa-3x text-primary"></i>
-                            </div>
-                            {% endif %}
-                            <div class="card-body">
-                                <h5 class="card-title">{{ product.Product_name }}</h5>
-                                <p class="text-muted">{{ product.Product_Category }}</p>
-                                <p class="fw-bold text-primary">₹{{ product.Product_price }}</p>
-                                <a href="{% url 'ProductSingleViewCustomer' product.id %}" class="btn btn-sm btn-primary">View Details</a>
-                            </div>
-                        </div>
-                    </div>
-                    {% empty %}
-                    <div class="col-12 text-center">
-                        <p>No products available at the moment.</p>
-                    </div>
-                    {% endfor %}
-                </div>
-            </div>
-        </section>
-        {% endblock %}
     </div>
 
     <!-- Footer -->
@@ -247,22 +162,16 @@
                 <div class="col-lg-4 mb-4 mb-lg-0">
                     <h5 class="text-white mb-3">Quick Links</h5>
                     <ul class="list-unstyled">
-                        <li><a href="/" class="text-white-50">Home</a></li>
+                        <li><a href="#" class="text-white-50">Home</a></li>
                         <li><a href="#features" class="text-white-50">Features</a></li>
-                        <li><a href="{% url 'SignIn' %}" class="text-white-50">Login</a></li>
-                        <li><a href="{% url 'SignUp' %}" class="text-white-50">Register</a></li>
+                        <li><a href="/signin" class="text-white-50">Login</a></li>
+                        <li><a href="/signup" class="text-white-50">Register</a></li>
                     </ul>
                 </div>
                 <div class="col-lg-4">
                     <h5 class="text-white mb-3">Contact Us</h5>
                     <p class="text-white-50">Email: info@agriconnect.com</p>
                     <p class="text-white-50">Phone: +91 1234567890</p>
-                    <div class="d-flex mt-3">
-                        <a href="#" class="btn btn-outline-light btn-sm me-2"><i class="fab fa-facebook-f"></i></a>
-                        <a href="#" class="btn btn-outline-light btn-sm me-2"><i class="fab fa-twitter"></i></a>
-                        <a href="#" class="btn btn-outline-light btn-sm me-2"><i class="fab fa-instagram"></i></a>
-                        <a href="#" class="btn btn-outline-light btn-sm"><i class="fab fa-linkedin-in"></i></a>
-                    </div>
                 </div>
             </div>
             <hr class="my-4 bg-light">

@@ -17,6 +17,8 @@ from django.utils.http import urlsafe_base64_encode
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.encoding import force_bytes
 import os
+import sys
+import django
 
 
 @admin_only
@@ -26,9 +28,42 @@ def Index(request):
         "products":products
     }
     
-    # Check if we're on Render and use the simplified template
+    # Check if we're on Render and use the ultra-simple landing page
     if 'RENDER' in os.environ:
-        return render(request, "index_simple.html", context)
+        try:
+            # Try the simplified template first
+            return render(request, "landing.html")
+        except:
+            # If that fails, return a simple HTML response
+            return HttpResponse("""
+            <!DOCTYPE html>
+            <html>
+                <head>
+                    <title>AgriConnect</title>
+                    <style>
+                        body { font-family: Arial; text-align: center; padding: 50px; }
+                        h1 { color: #28a745; }
+                        .btn { 
+                            display: inline-block;
+                            background: #28a745;
+                            color: white;
+                            padding: 10px 20px;
+                            text-decoration: none;
+                            border-radius: 5px;
+                            margin: 10px;
+                        }
+                    </style>
+                </head>
+                <body>
+                    <h1>Welcome to AgriConnect</h1>
+                    <p>Connecting farmers, experts, and customers</p>
+                    <div>
+                        <a href="/signin" class="btn">Login</a>
+                        <a href="/signup" class="btn">Register</a>
+                    </div>
+                </body>
+            </html>
+            """)
     else:
         return render(request, "index.html", context)
 
@@ -334,7 +369,9 @@ def health_check(request):
             <div class="status">
                 <p><strong>Status:</strong> Service is running</p>
                 <p><strong>Database:</strong> {db_status}</p>
-                <p><strong>Render:</strong> {'Yes' if 'RENDER' in request.META.get('SERVER_SOFTWARE', '') else 'No'}</p>
+                <p><strong>Render:</strong> {'Yes' if 'RENDER' in os.environ else 'No'}</p>
+                <p><strong>Python Version:</strong> {sys.version.split()[0]}</p>
+                <p><strong>Django Version:</strong> {django.get_version()}</p>
             </div>
         </body>
     </html>
