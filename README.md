@@ -69,4 +69,4 @@ You can also deploy manually using the `render.yaml` configuration file in this 
 - Expert advice platform
 - Administrative dashboard
 - User management
-- Payment integration with Razorpay 
+- Payment integration with Razorpay.
